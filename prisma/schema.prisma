@@ -1,0 +1,276 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User authentication and profile
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  name          String?
+  avatarUrl     String?   @map("avatar_url")
+  emailVerified DateTime? @map("email_verified")
+  password      String?   // For email/password auth
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  accounts          Account[]
+  workspacesOwned   Workspace[]       @relation("WorkspaceOwner")
+  workspaceMemberships WorkspaceMember[]
+  formsCreated      Form[]            @relation("FormCreator")
+  themesCreated     Theme[]
+
+  @@map("users")
+}
+
+// OAuth accounts
+model Account {
+  id                String   @id @default(uuid())
+  userId            String   @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String   @map("provider_account_id")
+  accessToken       String?  @map("access_token") @db.Text
+  refreshToken      String?  @map("refresh_token") @db.Text
+  expiresAt         Int?     @map("expires_at")
+  tokenType         String?  @map("token_type")
+  scope             String?
+  idToken           String?  @map("id_token") @db.Text
+  sessionState      String?  @map("session_state")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+// Workspaces for multi-tenancy
+model Workspace {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  ownerId   String   @map("owner_id")
+  settings  Json?    @db.JsonB // Workspace preferences
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  owner   User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members WorkspaceMember[]
+  forms   Form[]
+  themes  Theme[]
+
+  @@index([ownerId])
+  @@map("workspaces")
+}
+
+// Workspace members with role-based access
+model WorkspaceMember {
+  id          String   @id @default(uuid())
+  workspaceId String   @map("workspace_id")
+  userId      String   @map("user_id")
+  role        String   // owner, admin, editor, viewer
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId])
+  @@index([userId])
+  @@map("workspace_members")
+}
+
+// Forms
+model Form {
+  id                   String    @id @default(uuid())
+  workspaceId          String    @map("workspace_id")
+  title                String
+  slug                 String    // Unique within workspace
+  description          String?
+  settings             Json?     @db.JsonB // Form configuration
+  themeId              String?   @map("theme_id")
+  isPublished          Boolean   @default(false) @map("is_published")
+  isAcceptingResponses Boolean   @default(true) @map("is_accepting_responses")
+  closeDate            DateTime? @map("close_date")
+  responseLimit        Int?      @map("response_limit")
+  passwordHash         String?   @map("password_hash")
+  createdBy            String    @map("created_by")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  workspace Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator   User         @relation("FormCreator", fields: [createdBy], references: [id])
+  theme     Theme?       @relation(fields: [themeId], references: [id], onDelete: SetNull)
+  fields    FormField[]
+  screens   FormScreen[]
+  responses Response[]
+  webhooks  Webhook[]
+
+  @@unique([workspaceId, slug])
+  @@index([workspaceId])
+  @@index([createdBy])
+  @@index([themeId])
+  @@map("forms")
+}
+
+// Form fields (questions)
+model FormField {
+  id          String   @id @default(uuid())
+  formId      String   @map("form_id")
+  type        String   // short_text, long_text, email, multiple_choice, etc.
+  title       String
+  description String?
+  properties  Json     @db.JsonB // Field-specific config
+  validations Json?    @db.JsonB // Validation rules
+  orderIndex  Int      @map("order_index")
+  isRequired  Boolean  @default(false) @map("is_required")
+  logicJumps  Json?    @db.JsonB @map("logic_jumps") // Conditional logic
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  form    Form             @relation(fields: [formId], references: [id], onDelete: Cascade)
+  answers ResponseAnswer[]
+
+  @@index([formId])
+  @@index([formId, orderIndex])
+  @@map("form_fields")
+}
+
+// Welcome and thank you screens
+model FormScreen {
+  id          String   @id @default(uuid())
+  formId      String   @map("form_id")
+  type        String   // welcome, thank_you
+  title       String
+  description String?
+  buttonText  String?  @map("button_text")
+  mediaUrl    String?  @map("media_url")
+  properties  Json?    @db.JsonB
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  form Form @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  @@index([formId, type])
+  @@map("form_screens")
+}
+
+// Form responses
+model Response {
+  id            String    @id @default(uuid())
+  formId        String    @map("form_id")
+  respondentId  String?   @map("respondent_id") // For tracking unique users
+  ipAddress     String?   @map("ip_address")
+  userAgent     String?   @map("user_agent")
+  startedAt     DateTime  @default(now()) @map("started_at")
+  completedAt   DateTime? @map("completed_at")
+  timeTaken     Int?      @map("time_taken") // Seconds
+  isCompleted   Boolean   @default(false) @map("is_completed")
+  metadata      Json?     @db.JsonB
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  form    Form             @relation(fields: [formId], references: [id], onDelete: Cascade)
+  answers ResponseAnswer[]
+  webhookLogs WebhookLog[]
+
+  @@index([formId])
+  @@index([formId, createdAt])
+  @@map("responses")
+}
+
+// Individual answers to form fields
+model ResponseAnswer {
+  id        String   @id @default(uuid())
+  responseId String   @map("response_id")
+  fieldId   String   @map("field_id")
+  value     Json     @db.JsonB // Stores any answer type
+  fileUrls  String[] @map("file_urls") // For file uploads
+  createdAt DateTime @default(now()) @map("created_at")
+
+  response Response  @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  field    FormField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@index([responseId])
+  @@index([fieldId])
+  @@map("response_answers")
+}
+
+// Themes for form customization
+model Theme {
+  id              String   @id @default(uuid())
+  workspaceId     String?  @map("workspace_id") // null for global themes
+  name            String
+  isPublic        Boolean  @default(false) @map("is_public")
+  colors          Json     @db.JsonB // primary, background, text, etc.
+  fonts           Json     @db.JsonB // font families and sizes
+  backgroundImage String?  @map("background_image")
+  createdBy       String   @map("created_by")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  workspace Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  creator   User       @relation(fields: [createdBy], references: [id])
+  forms     Form[]
+
+  @@index([workspaceId])
+  @@index([createdBy])
+  @@map("themes")
+}
+
+// Webhooks for integrations
+model Webhook {
+  id        String   @id @default(uuid())
+  formId    String   @map("form_id")
+  url       String
+  secret    String   // For signature verification
+  events    String[] // which events trigger webhook
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  form Form         @relation(fields: [formId], references: [id], onDelete: Cascade)
+  logs WebhookLog[]
+
+  @@index([formId])
+  @@map("webhooks")
+}
+
+// Password reset tokens
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  email     String
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([email])
+  @@map("password_reset_tokens")
+}
+
+// Webhook delivery logs
+model WebhookLog {
+  id           String   @id @default(uuid())
+  webhookId    String   @map("webhook_id")
+  responseId   String?  @map("response_id")
+  statusCode   Int?     @map("status_code")
+  requestBody  Json?    @db.JsonB @map("request_body")
+  responseBody String?  @map("response_body") @db.Text
+  errorMessage String?  @map("error_message") @db.Text
+  attemptedAt  DateTime @default(now()) @map("attempted_at")
+
+  webhook  Webhook   @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+  response Response? @relation(fields: [responseId], references: [id], onDelete: SetNull)
+
+  @@index([webhookId])
+  @@index([responseId])
+  @@index([attemptedAt])
+  @@map("webhook_logs")
+}

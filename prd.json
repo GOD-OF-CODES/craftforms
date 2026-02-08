@@ -1,0 +1,822 @@
+{
+  "branchName": "main",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Project Foundation & Next.js Setup",
+      "acceptanceCriteria": [
+        "Next.js 14+ project initialized with App Router and TypeScript",
+        "Tailwind CSS configured with custom design system (colors, fonts, spacing)",
+        "ESLint, Prettier, and TypeScript strict mode configured",
+        "Environment variable management setup (.env.example created)",
+        "Project runs with 'npm run dev' without errors",
+        "TypeScript compiles with zero errors",
+        "Tailwind classes apply correctly"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Foundation - Week 1. Sets up the base Next.js project with all tooling."
+    },
+    {
+      "id": "US-002",
+      "title": "Database Setup & Prisma Schema",
+      "acceptanceCriteria": [
+        "PostgreSQL database configured (local development)",
+        "Prisma ORM initialized with complete schema for all 13 tables",
+        "Tables: users, accounts, workspaces, workspace_members, forms, form_fields, form_screens, responses, response_answers, themes, webhooks, webhook_logs",
+        "All foreign key relationships defined correctly",
+        "Prisma migrations run successfully",
+        "Prisma client singleton created in src/lib/prisma.ts",
+        "Database schema matches spec.md Section 2.2 exactly"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "Foundation - Week 1. Critical database schema that all features depend on."
+    },
+    {
+      "id": "US-003",
+      "title": "NextAuth.js Authentication System",
+      "acceptanceCriteria": [
+        "NextAuth.js configured in /api/auth/[...nextauth]/route.ts",
+        "Email/password provider working with bcrypt hashing (12+ rounds)",
+        "Google OAuth provider integrated and functional",
+        "GitHub OAuth provider integrated and functional",
+        "Session management working with secure tokens",
+        "Protected route middleware implemented in middleware.ts",
+        "Users can sign up with email/password",
+        "Users can login with Google",
+        "Users can login with GitHub",
+        "Sessions persist correctly across page refreshes"
+      ],
+      "priority": 3,
+      "passes": true,
+      "notes": "Foundation - Week 2. Core authentication before any feature work."
+    },
+    {
+      "id": "US-004",
+      "title": "Email Service & Verification Flow",
+      "acceptanceCriteria": [
+        "Email service configured (Resend or SendGrid)",
+        "Email verification flow implemented",
+        "Password reset flow implemented",
+        "Email templates created for verification and password reset",
+        "Verification emails sent on signup",
+        "Password reset emails sent on request",
+        "Email verification links work correctly",
+        "Password reset links work correctly and expire after use",
+        "Email sending utility created in src/lib/email.ts"
+      ],
+      "priority": 4,
+      "passes": true,
+      "notes": "Foundation - Week 2. Completes authentication system with email flows."
+    },
+    {
+      "id": "US-005",
+      "title": "Authentication UI Pages",
+      "acceptanceCriteria": [
+        "Login page created at /app/(auth)/login/page.tsx",
+        "Signup page created at /app/(auth)/signup/page.tsx",
+        "Password reset page created at /app/(auth)/reset-password/page.tsx",
+        "Email verification page created at /app/(auth)/verify-email/page.tsx",
+        "All auth forms have proper validation",
+        "Error messages display clearly",
+        "Loading states implemented",
+        "Redirect to dashboard after successful login",
+        "Mobile responsive design"
+      ],
+      "priority": 5,
+      "passes": true,
+      "notes": "Foundation - Week 2. UI for authentication flows."
+    },
+    {
+      "id": "US-006",
+      "title": "UI Component Library",
+      "acceptanceCriteria": [
+        "25+ reusable UI components built in /src/components/ui/",
+        "Components: Button, Input, Textarea, Select, Checkbox, Radio, Switch, Label",
+        "Components: Card, Badge, Avatar, Tooltip, Table, Modal, Toast",
+        "Components: Sidebar, Tabs, Alert, Loading Spinner, Progress Bar",
+        "Components: DatePicker, ColorPicker, FileUpload, Dropdown Menu",
+        "All components fully accessible (WCAG 2.1 AA)",
+        "Keyboard navigation works for all interactive elements",
+        "Components responsive on mobile/tablet/desktop",
+        "Framer Motion animations integrated",
+        "Design system matches spec.md Section 14 (colors, typography, spacing)"
+      ],
+      "priority": 6,
+      "passes": true,
+      "notes": "Week 3. Reusable component library needed before building features."
+    },
+    {
+      "id": "US-007",
+      "title": "Workspace Creation & Management",
+      "acceptanceCriteria": [
+        "Workspace model implemented with Prisma",
+        "API routes: POST /api/workspaces, GET /api/workspaces, PATCH /api/workspaces/[id], DELETE /api/workspaces/[id]",
+        "Users can create workspaces with name and auto-generated slug",
+        "Default workspace auto-created on user signup",
+        "Workspace settings page created",
+        "Users can rename workspace",
+        "Users can change workspace slug",
+        "Owners can delete workspace",
+        "Workspace switcher UI component built",
+        "Dashboard layout created with sidebar navigation"
+      ],
+      "priority": 7,
+      "passes": true,
+      "notes": "Week 4. Multi-tenant workspace foundation."
+    },
+    {
+      "id": "US-008",
+      "title": "Workspace Member Management & RBAC",
+      "acceptanceCriteria": [
+        "Workspace member model and role system implemented",
+        "Roles: owner, admin, editor, viewer with correct permissions",
+        "API routes for member management: GET/POST/PATCH/DELETE /api/workspaces/[id]/members",
+        "Member invitation system via email",
+        "Invitation emails sent with accept/decline links",
+        "Pending invitations list visible in settings",
+        "Members can accept/decline invitations",
+        "Role changes work correctly",
+        "Permission checks implemented in src/lib/permissions.ts",
+        "Only owner can delete workspace",
+        "Only owner/admin can manage members",
+        "UI shows member list with roles and actions"
+      ],
+      "priority": 8,
+      "passes": true,
+      "notes": "Week 4. Role-based access control for team collaboration."
+    },
+    {
+      "id": "US-009",
+      "title": "Form Builder UI - Three Panel Layout",
+      "acceptanceCriteria": [
+        "Form model created in Prisma",
+        "Three-panel layout implemented: fields palette (left), preview (center), settings (right)",
+        "Form creation flow working",
+        "API routes: POST /api/workspaces/[workspaceId]/forms, GET/PATCH/DELETE /api/forms/[id]",
+        "Forms list view with search/filter",
+        "Form builder page at /app/(dashboard)/[workspaceSlug]/forms/[formId]/edit/page.tsx",
+        "Zustand store created for form builder state",
+        "Auto-save implemented with 2-second debounce",
+        "Forms persist to database correctly",
+        "Form title and description editable",
+        "Custom slug generation for forms",
+        "Layout responsive (collapses on mobile/tablet)"
+      ],
+      "priority": 9,
+      "passes": true,
+      "notes": "Week 5. Core form builder interface before adding field types."
+    },
+    {
+      "id": "US-010",
+      "title": "Form Builder - Basic Question Types (6 types)",
+      "acceptanceCriteria": [
+        "TypeScript discriminated union type system for all field types",
+        "Form fields model in Prisma with JSONB properties",
+        "API routes for fields: GET/POST/PATCH/DELETE /api/forms/[formId]/fields",
+        "Short Text field type with placeholder, max length, default value",
+        "Long Text field type with auto-resize textarea",
+        "Email field type with validation",
+        "Number field type with min/max values and decimal places",
+        "Multiple Choice field type with add/remove/reorder options",
+        "Checkboxes field type with min/max selections",
+        "Each field type has builder component and settings panel",
+        "Fields can be added from palette",
+        "Fields can be reordered via drag-drop",
+        "Field settings panel updates based on selected field",
+        "Preview panel shows one-question-at-a-time view"
+      ],
+      "priority": 10,
+      "passes": true,
+      "notes": "Week 5-6. First 6 question types to validate form builder architecture."
+    },
+    {
+      "id": "US-011",
+      "title": "Form Builder - Extended Question Types (12 types)",
+      "acceptanceCriteria": [
+        "Dropdown field type with searchable options",
+        "Yes/No field type with custom labels",
+        "Rating Scale field type (1-5 or 1-10 stars)",
+        "Opinion Scale field type (0-10 linear scale)",
+        "Date field type with date picker and min/max range",
+        "Phone Number field type with country code selector",
+        "Website URL field type with validation",
+        "Legal Consent field type with checkbox and legal text",
+        "File Upload field type with S3/Vercel Blob integration",
+        "Ranking field type with drag-drop reordering",
+        "Matrix/Grid field type with rows and columns",
+        "Payment field type placeholder (future enhancement)",
+        "File upload API route at /api/upload",
+        "Presigned URL generation for secure uploads",
+        "All field types have complete settings panels",
+        "All 18 field types working in form builder"
+      ],
+      "priority": 11,
+      "passes": true,
+      "notes": "Week 7. Completes all question types. File upload needs external storage setup."
+    },
+    {
+      "id": "US-012",
+      "title": "Field Validation System",
+      "acceptanceCriteria": [
+        "Validation engine implemented in src/lib/validations.ts",
+        "Required field validation",
+        "Min/max length validation for text fields",
+        "Min/max value validation for number fields",
+        "Regex pattern matching validation",
+        "Email format validation",
+        "URL format validation",
+        "Phone number format validation",
+        "File size and type validation",
+        "Custom error messages configurable",
+        "Validation configuration UI in settings panel",
+        "Client-side validation on form submission",
+        "Validation errors display clearly to respondents"
+      ],
+      "priority": 12,
+      "passes": true,
+      "notes": "Week 6-7. Validation system for all field types."
+    },
+    {
+      "id": "US-013",
+      "title": "Welcome & Thank You Screens",
+      "acceptanceCriteria": [
+        "Form screens model in Prisma (welcome, thank_you)",
+        "Welcome screen configuration UI in form builder",
+        "Thank you screen configuration UI in form builder",
+        "API routes for screens: /api/forms/[id]/screens",
+        "Welcome screen: custom title, description, button text",
+        "Thank you screen: custom title, description, redirect URL",
+        "Media upload support for screens (images/videos)",
+        "Rich text formatting for screen descriptions",
+        "Social share buttons option for thank you screen",
+        "Enable/disable toggle for each screen",
+        "Screens preview in form builder"
+      ],
+      "priority": 13,
+      "passes": true,
+      "notes": "Week 8. Screens that bookend the form experience."
+    },
+    {
+      "id": "US-014",
+      "title": "Form Publishing & Public Routes",
+      "acceptanceCriteria": [
+        "Form publish/unpublish API routes: POST /api/forms/[id]/publish, /unpublish",
+        "Public form route at /app/to/[workspaceSlug]/[formSlug]/page.tsx",
+        "Published forms accessible via public URL",
+        "Draft forms not accessible publicly",
+        "Preview functionality before publishing",
+        "Form duplication API route: POST /api/forms/[id]/duplicate",
+        "Forms can be cloned with all fields and settings",
+        "Public form URL displayed after publishing",
+        "Copy link button for easy sharing",
+        "QR code generation for form URL"
+      ],
+      "priority": 14,
+      "passes": true,
+      "notes": "Week 8. Publishing system to make forms accessible."
+    },
+    {
+      "id": "US-015",
+      "title": "Form Rendering Engine - One Question at a Time",
+      "acceptanceCriteria": [
+        "Form rendering engine built in src/components/form-renderer/",
+        "One question displayed at a time (Typeform signature UX)",
+        "Smooth transitions between questions using Framer Motion",
+        "All 18 field types render correctly for respondents",
+        "Welcome screen displays if enabled",
+        "Thank you screen displays after submission",
+        "Progress indicator shows completion percentage",
+        "Navigation: Next/Back buttons, Enter key to continue",
+        "Keyboard navigation (Tab, Arrow keys) works",
+        "Mobile responsive - works perfectly on phones/tablets",
+        "Full-screen immersive experience",
+        "Loading states while navigating"
+      ],
+      "priority": 15,
+      "passes": true,
+      "notes": "Week 9. Core respondent experience - most important user-facing feature."
+    },
+    {
+      "id": "US-016",
+      "title": "Response Submission & Storage",
+      "acceptanceCriteria": [
+        "Response and response_answers models in Prisma",
+        "Public submission API route: POST /api/public/forms/[formId]/submit",
+        "Response metadata captured: IP, user agent, timestamps",
+        "Completion time tracked (started_at to completed_at)",
+        "Answers stored in response_answers with JSONB values",
+        "File uploads stored as URLs in file_urls array",
+        "Client-side validation before submission",
+        "Validation errors displayed clearly",
+        "Draft response state managed (auto-save answers)",
+        "Submission success redirects to thank you screen or URL",
+        "Duplicate submission prevention if configured"
+      ],
+      "priority": 16,
+      "passes": true,
+      "notes": "Week 9. Response collection and storage system."
+    },
+    {
+      "id": "US-017",
+      "title": "Logic Jumps - Conditional Branching",
+      "acceptanceCriteria": [
+        "Logic jump data structure designed (JSONB in form_fields.logic_jumps)",
+        "Logic engine implemented in src/lib/logicEngine.ts",
+        "Condition builder UI in form builder",
+        "Condition types: equals, not_equals, contains, greater_than, less_than, is_selected, is_empty",
+        "AND/OR logic support for multiple conditions",
+        "Actions: jump to specific question, skip to end",
+        "Logic execution in form renderer",
+        "Visual logic flow diagram/indicator",
+        "Logic validation (prevent infinite loops)",
+        "Logic preview/testing tool",
+        "Logic jumps execute correctly during form taking",
+        "Back button respects logic jumps"
+      ],
+      "priority": 17,
+      "passes": true,
+      "notes": "Week 10. Complex conditional logic for dynamic forms."
+    },
+    {
+      "id": "US-018",
+      "title": "Response Management - List & Detail Views",
+      "acceptanceCriteria": [
+        "Responses list page at /app/(dashboard)/[workspaceSlug]/forms/[formId]/responses/page.tsx",
+        "Response detail page at /app/(dashboard)/[workspaceSlug]/forms/[formId]/responses/[responseId]/page.tsx",
+        "Paginated table view of all responses",
+        "API route: GET /api/forms/[formId]/responses with pagination",
+        "Table columns: submission date, completion time, status",
+        "Individual response detail view with all Q&A",
+        "Submission metadata displayed (time taken, IP, user agent)",
+        "Navigate between responses (prev/next buttons)",
+        "Delete individual response functionality",
+        "Bulk select and delete responses",
+        "Flag/mark responses",
+        "Empty state when no responses"
+      ],
+      "priority": 18,
+      "passes": true,
+      "notes": "Week 11. Response viewing and management."
+    },
+    {
+      "id": "US-019",
+      "title": "Response Filtering, Search & Export",
+      "acceptanceCriteria": [
+        "Filter responses by date range",
+        "Filter by completion status (completed/incomplete)",
+        "Filter by specific field values",
+        "Search functionality across responses",
+        "Sort by any column (date, time, status)",
+        "CSV export API route: POST /api/forms/[formId]/responses/export",
+        "Excel export functionality",
+        "Export includes all fields and metadata",
+        "Date range selection for exports",
+        "Export selected responses only (bulk action)",
+        "Download triggers immediately with correct filename"
+      ],
+      "priority": 19,
+      "passes": true,
+      "notes": "Week 11. Advanced response management features."
+    },
+    {
+      "id": "US-020",
+      "title": "Response Analytics Dashboard",
+      "acceptanceCriteria": [
+        "Analytics component at /src/components/responses/ResponseAnalytics.tsx",
+        "Total responses count displayed",
+        "Completion rate calculated and shown",
+        "Average completion time displayed",
+        "Responses over time line chart",
+        "Per-question analytics: multiple choice percentage breakdown (pie chart)",
+        "Per-question analytics: rating average score",
+        "Analytics calculations in src/lib/analytics.ts",
+        "Charts render correctly using chart library",
+        "Analytics update in real-time when new responses arrive"
+      ],
+      "priority": 20,
+      "passes": true,
+      "notes": "Week 11. Basic analytics to provide insights."
+    },
+    {
+      "id": "US-021",
+      "title": "Theme System - Editor & Customization",
+      "acceptanceCriteria": [
+        "Theme model in Prisma with JSONB for colors, fonts, background, layout",
+        "Theme editor page at /app/(dashboard)/[workspaceSlug]/themes/[themeId]/edit/page.tsx",
+        "Theme library page listing all themes",
+        "API routes: GET/POST/PATCH/DELETE /api/workspaces/[workspaceId]/themes",
+        "Color customization: primary, background, text, button text, error, success",
+        "Color picker component with presets",
+        "Typography controls: question font, answer font, button font",
+        "Google Fonts integration (src/lib/googleFonts.ts)",
+        "Background customization: solid color, gradient, image upload",
+        "Background opacity and blur controls",
+        "Layout options: alignment, container width, spacing",
+        "Button customization: shape, size, style",
+        "Live preview while editing theme",
+        "Theme duplication and deletion",
+        "Apply theme to form"
+      ],
+      "priority": 21,
+      "passes": true,
+      "notes": "Week 12. Comprehensive theme customization system."
+    },
+    {
+      "id": "US-022",
+      "title": "Theme Application to Public Forms",
+      "acceptanceCriteria": [
+        "Theme applier utility in src/lib/themeApplier.ts",
+        "CSS variables injected based on theme settings",
+        "Public forms render with applied theme",
+        "Colors apply correctly (primary, background, text, etc.)",
+        "Fonts load from Google Fonts",
+        "Background images/gradients display correctly",
+        "Layout options (alignment, width, spacing) apply",
+        "Button styles match theme settings",
+        "Theme changes preview in real-time in builder",
+        "Default theme applied if no custom theme",
+        "Theme persists across form sessions"
+      ],
+      "priority": 22,
+      "passes": true,
+      "notes": "Week 12. Theme application to make forms visually customized."
+    },
+    {
+      "id": "US-023",
+      "title": "Form Settings - General & Access Control",
+      "acceptanceCriteria": [
+        "Form settings page at /app/(dashboard)/[workspaceSlug]/forms/[formId]/settings/page.tsx",
+        "Tabbed interface: General, Access, Notifications, Integrations",
+        "General tab: form title, description, custom URL slug, language",
+        "Access control: publish/unpublish toggle, accept responses toggle",
+        "Password protection with bcrypt hashing",
+        "Response limit (stop after X responses)",
+        "Close date (stop accepting after date)",
+        "Access control enforcement on public form submission",
+        "Password prompt on public form if protected",
+        "Form shows 'closed' message when limit reached or date passed",
+        "Settings save successfully"
+      ],
+      "priority": 23,
+      "passes": true,
+      "notes": "Week 13. Form configuration and access control."
+    },
+    {
+      "id": "US-024",
+      "title": "Email Notifications for Responses",
+      "acceptanceCriteria": [
+        "Notification settings tab in form settings",
+        "Email on new response toggle",
+        "Notification recipients field (comma-separated emails)",
+        "Custom email subject configuration",
+        "Respondent confirmation email option",
+        "Email notification sent when response submitted",
+        "Notification email template created",
+        "Confirmation email template created",
+        "Emails include form name and response summary",
+        "Unsubscribe link in notification emails",
+        "Email sending triggered via webhook or background job",
+        "Notifications system in src/lib/notifications.ts"
+      ],
+      "priority": 24,
+      "passes": true,
+      "notes": "Week 13. Email notification system for responses."
+    },
+    {
+      "id": "US-025",
+      "title": "Form Response Options & Behavior",
+      "acceptanceCriteria": [
+        "Response options tab in form settings",
+        "Allow multiple responses per user toggle",
+        "Show progress bar option",
+        "Show question numbers option",
+        "Enable navigation buttons (back/forward) option",
+        "Randomize question order option",
+        "Thank you options: redirect URL, show response summary",
+        "Settings apply correctly on public forms",
+        "Progress bar displays if enabled",
+        "Question numbers show if enabled",
+        "Back button appears if navigation enabled"
+      ],
+      "priority": 25,
+      "passes": true,
+      "notes": "Week 13. Response behavior configuration."
+    },
+    {
+      "id": "US-026",
+      "title": "Webhook System - Configuration & Delivery",
+      "acceptanceCriteria": [
+        "Webhook model in Prisma",
+        "Integrations tab in form settings",
+        "Webhook configuration UI for adding URL and events",
+        "API routes: GET/POST/PATCH/DELETE /api/forms/[formId]/webhooks",
+        "Webhook secret generation for HMAC signature",
+        "Event selection: response.submitted",
+        "Enable/disable webhook toggle",
+        "Test webhook functionality (send test payload)",
+        "Webhook delivery service in src/lib/webhooks/deliveryService.ts",
+        "HMAC signature generation in src/lib/webhooks/signatureGenerator.ts",
+        "Retry logic with exponential backoff (3 attempts)",
+        "Background job processing for webhook delivery",
+        "Webhook fires on form submission",
+        "Payload format matches spec.md Section 4.9"
+      ],
+      "priority": 26,
+      "passes": true,
+      "notes": "Week 14. Webhook integration for external services."
+    },
+    {
+      "id": "US-027",
+      "title": "Webhook Logging & Monitoring",
+      "acceptanceCriteria": [
+        "Webhook logs model in Prisma",
+        "Webhook logs page showing all delivery attempts",
+        "API route: GET /api/webhooks/[id]/logs",
+        "Logs display: status (success/failed), timestamp, status code",
+        "Request body and response body logged",
+        "Error messages logged for failed attempts",
+        "Retry attempts tracked and displayed",
+        "Filter logs by status (success/failed)",
+        "Logs paginated for performance",
+        "Recent logs visible in webhook settings"
+      ],
+      "priority": 27,
+      "passes": true,
+      "notes": "Week 14. Webhook monitoring and debugging."
+    },
+    {
+      "id": "US-028",
+      "title": "Keyboard Shortcuts & Undo/Redo",
+      "acceptanceCriteria": [
+        "Keyboard shortcuts hook in src/hooks/useKeyboardShortcuts.ts",
+        "Cmd/Ctrl + S saves form",
+        "Cmd/Ctrl + P opens form preview",
+        "Cmd/Ctrl + Z undo last change",
+        "Cmd/Ctrl + Shift + Z redo change",
+        "Cmd/Ctrl + D duplicates selected field",
+        "Delete key deletes selected field",
+        "Esc closes modals/panels",
+        "Tab navigates between fields",
+        "Arrow keys navigate fields in builder",
+        "Undo/redo state management in src/hooks/useUndoRedo.ts",
+        "Shortcuts work only in form builder context",
+        "Keyboard shortcut hints displayed"
+      ],
+      "priority": 28,
+      "passes": true,
+      "notes": "Week 15. Productivity features for power users."
+    },
+    {
+      "id": "US-029",
+      "title": "Loading States & Error Handling",
+      "acceptanceCriteria": [
+        "Skeleton loaders for all major views",
+        "Loading spinner during async operations",
+        "Optimistic UI updates for instant feedback",
+        "Error boundary component in src/components/ui/error-boundary.tsx",
+        "User-friendly error messages throughout app",
+        "Toast notifications for success/error actions",
+        "Retry mechanism for failed operations",
+        "Global error handling in src/lib/errorHandling.ts",
+        "Network error handling with retry",
+        "404 and 500 error pages",
+        "Empty states with helpful CTAs"
+      ],
+      "priority": 29,
+      "passes": true,
+      "notes": "Week 15. Polish for production-ready UX."
+    },
+    {
+      "id": "US-030",
+      "title": "Performance Optimization",
+      "acceptanceCriteria": [
+        "Database indexes on frequently queried columns (form_id, workspace_id, user_id)",
+        "React Query caching strategies implemented",
+        "Next.js image optimization (next/image) for all images",
+        "Code splitting for large components",
+        "Lazy loading for form builder panels",
+        "Bundle size optimized (check with bundle analyzer)",
+        "Database connection pooling configured",
+        "API route response time < 200ms (p95)",
+        "Initial page load < 2s (LCP)",
+        "Form builder loads < 1s",
+        "Form taking loads < 1s",
+        "Lighthouse performance score > 90"
+      ],
+      "priority": 30,
+      "passes": true,
+      "notes": "Week 15. Performance optimization for production."
+    },
+    {
+      "id": "US-031",
+      "title": "Accessibility Compliance",
+      "acceptanceCriteria": [
+        "WCAG 2.1 AA compliance achieved",
+        "Color contrast ratio 4.5:1 for text, 3:1 for large text",
+        "All interactive elements keyboard accessible",
+        "Focus indicators visible on all elements",
+        "Skip to content link on all pages",
+        "Semantic HTML throughout (headings, landmarks, lists)",
+        "ARIA labels where needed (icon buttons, etc.)",
+        "Alt text for all images",
+        "Form labels and error messages properly associated",
+        "Screen reader announces page changes and loading states",
+        "Heading hierarchy correct (h1, h2, h3)",
+        "Accessibility score > 90 (Lighthouse)"
+      ],
+      "priority": 31,
+      "passes": true,
+      "notes": "Week 15. Accessibility audit and fixes."
+    },
+    {
+      "id": "US-032",
+      "title": "Security Audit & Hardening",
+      "acceptanceCriteria": [
+        "Password hashing with bcrypt (12+ rounds)",
+        "Session tokens with expiration",
+        "CSRF protection enabled",
+        "Rate limiting on auth endpoints",
+        "SQL injection prevention (Prisma parameterized queries)",
+        "XSS protection (input sanitization)",
+        "Input validation on all API endpoints",
+        "File upload validation (type, size)",
+        "HTTPS only (SSL enforced in production)",
+        "Secure file storage with signed URLs",
+        "Row-level security checks in all queries",
+        "Webhook signature verification working",
+        "No critical vulnerabilities (security scan)",
+        "Security headers configured (CSP, X-Frame-Options, etc.)"
+      ],
+      "priority": 32,
+      "passes": true,
+      "notes": "Week 15. Security hardening before launch."
+    },
+    {
+      "id": "US-033",
+      "title": "Responsive Design & Cross-Browser Testing",
+      "acceptanceCriteria": [
+        "App works perfectly on mobile (320px-640px)",
+        "App works perfectly on tablet (641px-1024px)",
+        "App works perfectly on desktop (1025px+)",
+        "Form builder responsive: single column on mobile, 2 panels on tablet, 3 panels on desktop",
+        "Form taking always full-screen and responsive",
+        "Touch targets minimum 44x44px on mobile",
+        "Tested on Chrome (latest)",
+        "Tested on Firefox (latest)",
+        "Tested on Safari (latest)",
+        "Tested on Edge (latest)",
+        "Tested on iOS Safari",
+        "Tested on Android Chrome",
+        "No console errors or warnings on any browser"
+      ],
+      "priority": 33,
+      "passes": false,
+      "notes": "Week 15. Ensure cross-platform compatibility."
+    },
+    {
+      "id": "US-034",
+      "title": "Testing - Unit & Integration Tests",
+      "acceptanceCriteria": [
+        "Unit tests for validation functions in tests/unit/validations.test.ts",
+        "Unit tests for logic engine in tests/unit/logicEngine.test.ts",
+        "Unit tests for utilities and hooks (>80% coverage)",
+        "Integration tests for auth flows in tests/integration/auth.test.ts",
+        "Integration tests for forms CRUD in tests/integration/forms.test.ts",
+        "Integration tests for response submission in tests/integration/responses.test.ts",
+        "Integration tests for workspace management",
+        "Integration tests for webhook delivery",
+        "Jest configured with React Testing Library",
+        "All tests pass",
+        "Test coverage > 80%"
+      ],
+      "priority": 34,
+      "passes": false,
+      "notes": "Week 16. Comprehensive test coverage."
+    },
+    {
+      "id": "US-035",
+      "title": "Testing - End-to-End Tests",
+      "acceptanceCriteria": [
+        "E2E test: Signup → Create workspace → Create form → Publish → Fill → View response",
+        "E2E test: Add logic jump → Test execution in form",
+        "E2E test: Invite team member → Accept invitation → Collaborate",
+        "E2E test: Configure theme → Apply to form → Verify on public page",
+        "E2E test: Set up webhook → Submit response → Verify webhook delivery",
+        "Playwright or Cypress configured",
+        "All critical user flows covered",
+        "Tests run in CI pipeline",
+        "All E2E tests pass consistently"
+      ],
+      "priority": 35,
+      "passes": false,
+      "notes": "Week 16. E2E tests for critical workflows."
+    },
+    {
+      "id": "US-036",
+      "title": "Documentation - User & Developer Guides",
+      "acceptanceCriteria": [
+        "User guide created in docs/user-guide.md",
+        "Getting started guide for new users",
+        "Form builder tutorial with screenshots",
+        "Logic jumps guide with examples",
+        "Theme customization guide",
+        "Response management guide",
+        "Workspace collaboration guide",
+        "Webhook integration guide with examples",
+        "FAQ section",
+        "Developer documentation in docs/developer-guide.md",
+        "API reference documentation in docs/api-reference.md",
+        "Database schema documentation",
+        "README.md with setup instructions",
+        "Contribution guidelines"
+      ],
+      "priority": 36,
+      "passes": true,
+      "notes": "Week 16. Complete documentation for users and developers. Created docs/user-guide.md, docs/developer-guide.md, docs/api-reference.md, README.md, and CONTRIBUTING.md."
+    },
+    {
+      "id": "US-037",
+      "title": "Production Deployment Setup",
+      "acceptanceCriteria": [
+        "Production PostgreSQL database configured",
+        "Environment variables set in production (Vercel)",
+        "Vercel Blob or AWS S3 configured for file storage",
+        "Resend/SendGrid configured for email service",
+        "Custom domain configured with SSL",
+        "Vercel deployment working correctly",
+        "Database migrations run in production",
+        "OAuth credentials configured for production URLs",
+        "All production environment variables validated",
+        "Production build successful with no errors"
+      ],
+      "priority": 37,
+      "passes": false,
+      "notes": "Week 17. Production environment setup."
+    },
+    {
+      "id": "US-038",
+      "title": "Monitoring, Analytics & CI/CD",
+      "acceptanceCriteria": [
+        "Sentry configured for error tracking",
+        "Vercel Analytics or PostHog configured for user analytics",
+        "Error tracking working (test error logged successfully)",
+        "Analytics tracking user actions (form creation, submission)",
+        "Uptime monitoring configured (optional: UptimeRobot)",
+        "Database backup strategy implemented",
+        "CI/CD pipeline with GitHub Actions",
+        "Tests run on every PR",
+        "Deploy to preview on PR",
+        "Deploy to production on merge to main",
+        "Deployment notifications to team"
+      ],
+      "priority": 38,
+      "passes": false,
+      "notes": "Week 17. Monitoring and CI/CD for production operations."
+    },
+    {
+      "id": "US-039",
+      "title": "Load Testing & Launch Preparation",
+      "acceptanceCriteria": [
+        "Load testing with 100+ concurrent form submissions",
+        "Load testing with 50+ concurrent form creations",
+        "Stress test response export with 1000+ responses",
+        "Performance remains stable under load",
+        "Database connection pool handles concurrent requests",
+        "No memory leaks detected",
+        "Response times acceptable under load (< 500ms p95)",
+        "Landing page/marketing site created",
+        "Onboarding flow refined and tested",
+        "Launch checklist completed (spec.md Section 19.1)",
+        "All features verified working in production",
+        "Beta users invited for testing"
+      ],
+      "priority": 39,
+      "passes": false,
+      "notes": "Week 17. Final testing and launch preparation."
+    },
+    {
+      "id": "US-040",
+      "title": "Production Launch",
+      "acceptanceCriteria": [
+        "Application live and accessible at production URL",
+        "All features working in production",
+        "No critical bugs in first 24 hours",
+        "Error rate < 0.1%",
+        "Page load times < 2s",
+        "Form submission success rate > 99%",
+        "SSL certificate active and valid",
+        "Email sending working in production",
+        "File uploads working in production",
+        "OAuth login working (Google, GitHub)",
+        "Monitoring dashboards showing green status",
+        "Launch announcement published",
+        "Support channel ready for user questions"
+      ],
+      "priority": 40,
+      "passes": false,
+      "notes": "Week 17. Official launch of Typeform clone to production."
+    }
+  ]
+}

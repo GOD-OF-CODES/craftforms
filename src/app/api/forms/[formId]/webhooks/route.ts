@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { generateWebhookSecret } from '@/lib/webhooks/signatureGenerator'
+import { isUrlSafe } from '@/lib/webhooks/deliveryService'
 
 // GET /api/forms/[formId]/webhooks - List webhooks
 export async function GET(
@@ -43,7 +44,8 @@ export async function GET(
       orderBy: { createdAt: 'desc' }
     })
 
-    return NextResponse.json(webhooks)
+    const sanitized = webhooks.map(({ secret, ...rest }) => rest)
+    return NextResponse.json(sanitized)
   } catch (error) {
     console.error('Get webhooks error:', error)
     return NextResponse.json(
@@ -88,11 +90,10 @@ export async function POST(
       return NextResponse.json({ error: 'URL is required' }, { status: 400 })
     }
 
-    // Validate URL
-    try {
-      new URL(body.url)
-    } catch {
-      return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
+    // Validate URL (including SSRF protection)
+    const urlCheck = isUrlSafe(body.url)
+    if (!urlCheck.safe) {
+      return NextResponse.json({ error: urlCheck.reason || 'Invalid URL' }, { status: 400 })
     }
 
     const webhook = await prisma.webhook.create({
@@ -105,7 +106,8 @@ export async function POST(
       }
     })
 
-    return NextResponse.json(webhook, { status: 201 })
+    const { secret: _secret, ...sanitizedWebhook } = webhook
+    return NextResponse.json(sanitizedWebhook, { status: 201 })
   } catch (error) {
     console.error('Create webhook error:', error)
     return NextResponse.json(

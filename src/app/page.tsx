@@ -11,7 +11,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <span className="text-2xl font-bold text-primary">FormFlow</span>
+              <span className="text-2xl font-bold text-primary">CraftForms</span>
             </div>
             <div className="flex items-center gap-4">
               <Link href="/login">
@@ -98,7 +98,7 @@ export default function LandingPage() {
             Ready to create better forms?
           </h2>
           <p className="text-lg text-text-secondary mb-8">
-            Join thousands of teams already using FormFlow to collect responses.
+            Join thousands of teams already using CraftForms to collect responses.
           </p>
           <Link href="/register">
             <Button variant="primary" size="lg">
@@ -113,7 +113,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <span className="text-text-secondary">
-              &copy; {new Date().getFullYear()} FormFlow. All rights reserved.
+              &copy; {new Date().getFullYear()} CraftForms. All rights reserved.
             </span>
             <div className="flex gap-6 mt-4 sm:mt-0">
               <Link href="/privacy" className="text-text-secondary hover:text-text-primary">

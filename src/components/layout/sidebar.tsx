@@ -72,9 +72,9 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
       <div className="p-6 border-b border-border">
         <Link href="/" className="flex items-center gap-2">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">T</span>
+            <span className="text-white font-bold text-lg">C</span>
           </div>
-          <span className="text-xl font-bold text-text-primary">Typeform</span>
+          <span className="text-xl font-bold text-text-primary">CraftForms</span>
         </Link>
       </div>
 

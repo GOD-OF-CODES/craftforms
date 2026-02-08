@@ -412,7 +412,7 @@ describe('Webhook Payload', () => {
       'X-Webhook-ID': 'webhook-1',
       'X-Webhook-Signature': 'sha256=abc123',
       'X-Webhook-Timestamp': Date.now().toString(),
-      'User-Agent': 'TypeformClone-Webhook/1.0',
+      'User-Agent': 'CraftForms-Webhook/1.0',
     }
 
     expect(headers['Content-Type']).toBe('application/json')

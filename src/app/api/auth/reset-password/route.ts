@@ -42,13 +42,11 @@ export async function POST(req: Request) {
 
     // Send the reset email
     const emailResult = await sendPasswordResetEmail(email, user.name || 'there', token)
-    console.log('[Password Reset] Email result:', JSON.stringify(emailResult))
-    console.log('[Password Reset] Reset URL:', `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password?token=${token}`)
 
     if (!emailResult.success) {
-      console.error('[Password Reset] Failed to send email:', emailResult.error)
+      console.error('[Password Reset] Failed to send email')
       return NextResponse.json(
-        { error: `Unable to send reset email: ${emailResult.error || 'Unknown error'}` },
+        { error: 'Unable to send reset email. Please try again later.' },
         { status: 500 }
       )
     }

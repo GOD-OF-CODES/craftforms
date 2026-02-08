@@ -97,11 +97,17 @@ export async function PATCH(req: Request, { params }: { params: { workspaceId: s
       )
     }
 
-    const data = await req.json()
+    const body = await req.json()
 
-    // If name is being updated, regenerate slug
-    if (data.name) {
-      data.slug = generateSlug(data.name)
+    // Whitelist allowed fields to prevent mass assignment
+    const data: Record<string, unknown> = {}
+    if (body.name !== undefined) {
+      data.name = body.name
+      data.slug = generateSlug(body.name)
+    }
+
+    if (Object.keys(data).length === 0) {
+      return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
     }
 
     const updated = await prisma.workspace.update({

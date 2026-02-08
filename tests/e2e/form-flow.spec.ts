@@ -7,7 +7,7 @@ test.describe('Form Creation Flow', () => {
   })
 
   test('should display landing page', async ({ page }) => {
-    await expect(page.locator('h1')).toContainText('Typeform')
+    await expect(page.locator('h1')).toContainText('CraftForms')
   })
 
   test('should navigate to login page', async ({ page }) => {

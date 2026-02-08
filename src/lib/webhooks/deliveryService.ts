@@ -5,6 +5,50 @@
 import { prisma } from '@/lib/prisma'
 import { generateWebhookHeaders } from './signatureGenerator'
 
+/**
+ * Validate that a webhook URL does not point to private/internal networks (SSRF protection)
+ */
+export function isUrlSafe(urlString: string): { safe: boolean; reason?: string } {
+  let parsed: URL
+  try {
+    parsed = new URL(urlString)
+  } catch {
+    return { safe: false, reason: 'Invalid URL' }
+  }
+
+  if (!['http:', 'https:'].includes(parsed.protocol)) {
+    return { safe: false, reason: 'Only HTTP and HTTPS protocols are allowed' }
+  }
+
+  const hostname = parsed.hostname
+
+  // Block localhost variants
+  if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1' || hostname === '[::1]' || hostname === '0.0.0.0') {
+    return { safe: false, reason: 'Localhost URLs are not allowed' }
+  }
+
+  // Block private IPv4 ranges
+  const ipv4Match = hostname.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/)
+  if (ipv4Match) {
+    const parts = ipv4Match.map(Number)
+    const a = parts[1]!
+    const b = parts[2]!
+    if (a === 10) return { safe: false, reason: 'Private IP addresses are not allowed' }
+    if (a === 172 && b >= 16 && b <= 31) return { safe: false, reason: 'Private IP addresses are not allowed' }
+    if (a === 192 && b === 168) return { safe: false, reason: 'Private IP addresses are not allowed' }
+    if (a === 169 && b === 254) return { safe: false, reason: 'Link-local addresses are not allowed' }
+    if (a === 127) return { safe: false, reason: 'Loopback addresses are not allowed' }
+    if (a === 0) return { safe: false, reason: 'Invalid IP address' }
+  }
+
+  // Block metadata endpoints (cloud providers)
+  if (hostname === '169.254.169.254' || hostname === 'metadata.google.internal') {
+    return { safe: false, reason: 'Cloud metadata endpoints are not allowed' }
+  }
+
+  return { safe: true }
+}
+
 interface WebhookPayload {
   event: string
   timestamp: string

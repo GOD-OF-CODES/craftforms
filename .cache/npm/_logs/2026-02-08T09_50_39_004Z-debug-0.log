@@ -1,0 +1,25 @@
+0 verbose cli /Users/rajvardhansingh/.nvm/versions/node/v22.12.0/bin/node /Users/rajvardhansingh/.nvm/versions/node/v22.12.0/lib/node_modules/npm/bin/npm-cli.js
+1 info using npm@10.9.0
+2 info using node@v22.12.0
+3 silly config load:file:/Users/rajvardhansingh/.nvm/versions/node/v22.12.0/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/rajvardhansingh/Documents/typeform-clone-final/.npmrc
+5 silly config load:file:/Users/rajvardhansingh/.npmrc
+6 silly config load:file:/Users/rajvardhansingh/.nvm/versions/node/v22.12.0/etc/npmrc
+7 verbose title npm exec tsc --noEmit
+8 verbose argv "exec" "--" "tsc" "--noEmit"
+9 verbose logfile logs-max:10 dir:/Users/rajvardhansingh/Documents/typeform-clone-final/.cache/npm/_logs/2026-02-08T09_50_39_004Z-
+10 verbose logfile /Users/rajvardhansingh/Documents/typeform-clone-final/.cache/npm/_logs/2026-02-08T09_50_39_004Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly logfile done cleaning log files
+13 http fetch GET 200 https://registry.npmjs.org/npm 446ms
+14 verbose cwd /Users/rajvardhansingh/Documents/typeform-clone-final
+15 verbose os Darwin 24.6.0
+16 verbose node v22.12.0
+17 verbose npm  v10.9.0
+18 notice
+18 notice New major version of npm available! 10.9.0 -> 11.9.0
+18 notice Changelog: https://github.com/npm/cli/releases/tag/v11.9.0
+18 notice To update run: npm install -g npm@11.9.0
+18 notice  { force: true, [Symbol(proc-log.meta)]: true }
+19 verbose exit 2
+20 verbose code 2

@@ -35,7 +35,7 @@ interface EmailResult {
 // Default configuration
 const defaultConfig: EmailConfig = {
   provider: (process.env.EMAIL_PROVIDER as EmailProvider) || 'resend',
-  from: process.env.EMAIL_FROM || 'Typeform Clone <noreply@example.com>',
+  from: process.env.EMAIL_FROM || 'CraftForms <noreply@example.com>',
   replyTo: process.env.EMAIL_REPLY_TO
 }
 
@@ -184,14 +184,14 @@ function wrapTemplate(content: string, title: string): string {
   <div class="container">
     <div class="card">
       <div class="logo">
-        <h1>Typeform Clone</h1>
+        <h1>CraftForms</h1>
       </div>
       <div class="content">
         ${content}
       </div>
     </div>
     <div class="footer">
-      <p>© ${new Date().getFullYear()} Typeform Clone. All rights reserved.</p>
+      <p>© ${new Date().getFullYear()} CraftForms. All rights reserved.</p>
       <p>If you didn't request this email, you can safely ignore it.</p>
     </div>
   </div>

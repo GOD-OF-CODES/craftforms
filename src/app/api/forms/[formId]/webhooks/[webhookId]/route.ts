@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { generateWebhookSecret } from '@/lib/webhooks/signatureGenerator'
+import { isUrlSafe } from '@/lib/webhooks/deliveryService'
 
 // GET /api/forms/[formId]/webhooks/[webhookId]
 export async function GET(
@@ -44,7 +45,8 @@ export async function GET(
       return NextResponse.json({ error: 'Webhook not found' }, { status: 404 })
     }
 
-    return NextResponse.json(webhook)
+    const { secret: _secret, ...sanitizedWebhook } = webhook
+    return NextResponse.json(sanitizedWebhook)
   } catch (error) {
     console.error('Get webhook error:', error)
     return NextResponse.json(
@@ -88,12 +90,11 @@ export async function PATCH(
 
     const body = await req.json()
 
-    // Validate URL if provided
+    // Validate URL if provided (including SSRF protection)
     if (body.url) {
-      try {
-        new URL(body.url)
-      } catch {
-        return NextResponse.json({ error: 'Invalid URL' }, { status: 400 })
+      const urlCheck = isUrlSafe(body.url)
+      if (!urlCheck.safe) {
+        return NextResponse.json({ error: urlCheck.reason || 'Invalid URL' }, { status: 400 })
       }
     }
 
@@ -108,7 +109,8 @@ export async function PATCH(
       data: updateData
     })
 
-    return NextResponse.json(updatedWebhook)
+    const { secret: _secret, ...sanitizedWebhook } = updatedWebhook
+    return NextResponse.json(sanitizedWebhook)
   } catch (error) {
     console.error('Update webhook error:', error)
     return NextResponse.json(

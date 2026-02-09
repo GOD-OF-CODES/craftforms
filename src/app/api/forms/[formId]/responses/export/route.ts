@@ -143,7 +143,7 @@ export async function POST(
       return new NextResponse(csvContent, {
         headers: {
           'Content-Type': 'text/csv',
-          'Content-Disposition': `attachment; filename="${form.title || 'responses'}-export.csv"`
+          'Content-Disposition': `attachment; filename="${(form.title || 'responses').replace(/[^a-zA-Z0-9_\- ]/g, '')}-export.csv"`
         }
       })
     } else if (format === 'json') {

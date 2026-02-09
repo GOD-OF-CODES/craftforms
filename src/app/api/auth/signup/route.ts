@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
+import { checkRateLimit, getClientIdentifier, rateLimitConfigs } from '@/lib/rateLimit'
 
 function generateSlug(name: string): string {
   return name
@@ -12,6 +13,16 @@ function generateSlug(name: string): string {
 
 export async function POST(req: Request) {
   try {
+    // Rate limit signup attempts
+    const clientId = getClientIdentifier(req)
+    const rateCheck = checkRateLimit(`signup:${clientId}`, rateLimitConfigs.auth)
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: 'Too many signup attempts. Please try again later.' },
+        { status: 429 }
+      )
+    }
+
     const { email, password, name } = await req.json()
 
     if (!email || !password) {

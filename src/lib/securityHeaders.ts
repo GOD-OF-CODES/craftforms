@@ -2,7 +2,7 @@
  * Security headers configuration
  */
 
-export const securityHeaders = {
+export const securityHeaders: Record<string, string> = {
   // Prevent clickjacking
   'X-Frame-Options': 'DENY',
 
@@ -21,7 +21,7 @@ export const securityHeaders = {
   // Content Security Policy
   'Content-Security-Policy': [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com",
+    "script-src 'self' 'unsafe-inline'",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: blob: https:",
@@ -29,8 +29,8 @@ export const securityHeaders = {
     "frame-ancestors 'none'",
   ].join('; '),
 
-  // HSTS (only in production)
-  // 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  // HSTS — enforce HTTPS
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
 }
 
 /**
@@ -88,9 +88,9 @@ export function isAllowedOrigin(origin: string, allowedOrigins: string[]): boole
   }
   return allowedOrigins.some((allowed) => {
     if (allowed.startsWith('*.')) {
-      // Wildcard subdomain matching
-      const domain = allowed.slice(2)
-      return origin.endsWith(domain) || origin === `https://${domain}` || origin === `http://${domain}`
+      // Wildcard subdomain matching — use stricter check
+      const domain = allowed.slice(1) // e.g. ".example.com"
+      return origin.endsWith(domain) && origin.indexOf('.') !== origin.lastIndexOf('.')
     }
     return origin === allowed
   })

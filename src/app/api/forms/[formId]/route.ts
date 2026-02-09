@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import bcrypt from 'bcryptjs'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { verifyFormAccess } from '@/lib/authz'
 
 function generateSlug(title: string): string {
   return title
@@ -20,15 +21,10 @@ export async function GET(_req: Request, { params }: { params: { formId: string 
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const form = await prisma.form.findUnique({
-      where: { id: params.formId },
-      include: {
-        fields: {
-          orderBy: { orderIndex: 'asc' },
-        },
-        screens: true,
-        theme: true,
-      },
+    const form = await verifyFormAccess(params.formId, session.user.id, {
+      includeFields: true,
+      includeScreens: true,
+      includeTheme: true,
     })
 
     if (!form) {
@@ -50,6 +46,13 @@ export async function PATCH(req: Request, { params }: { params: { formId: string
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Verify ownership before allowing update
+    const existingForm = await verifyFormAccess(params.formId, session.user.id)
+
+    if (!existingForm) {
+      return NextResponse.json({ error: 'Form not found' }, { status: 404 })
+    }
+
     const body = await req.json()
 
     // Build update data
@@ -58,7 +61,6 @@ export async function PATCH(req: Request, { params }: { params: { formId: string
     // Basic fields
     if (body.title !== undefined) {
       updateData.title = body.title
-      // Only regenerate slug if explicitly not provided
       if (body.slug === undefined) {
         updateData.slug = generateSlug(body.title)
       }
@@ -73,8 +75,7 @@ export async function PATCH(req: Request, { params }: { params: { formId: string
 
     // Password protection
     if (body.password) {
-      const salt = await bcrypt.genSalt(12)
-      updateData.passwordHash = await bcrypt.hash(body.password, salt)
+      updateData.passwordHash = await bcrypt.hash(body.password, 12)
     }
     if (body.removePassword) {
       updateData.passwordHash = null
@@ -82,11 +83,7 @@ export async function PATCH(req: Request, { params }: { params: { formId: string
 
     // Settings (merge with existing)
     if (body.settings) {
-      const existingForm = await prisma.form.findUnique({
-        where: { id: params.formId },
-        select: { settings: true }
-      })
-      const existingSettings = (existingForm?.settings as Record<string, unknown>) || {}
+      const existingSettings = (existingForm.settings as Record<string, unknown>) || {}
       updateData.settings = { ...existingSettings, ...body.settings }
     }
 
@@ -108,6 +105,13 @@ export async function DELETE(_req: Request, { params }: { params: { formId: stri
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Verify ownership before allowing delete
+    const form = await verifyFormAccess(params.formId, session.user.id)
+
+    if (!form) {
+      return NextResponse.json({ error: 'Form not found' }, { status: 404 })
     }
 
     await prisma.form.delete({

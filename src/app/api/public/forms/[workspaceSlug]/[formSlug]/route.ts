@@ -1,9 +1,10 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { verifyAccessToken } from '@/lib/formAccessToken'
 
 // GET /api/public/forms/[workspaceSlug]/[formSlug] - Get public form data
 export async function GET(
-  _req: Request,
+  _req: NextRequest,
   { params }: { params: { workspaceSlug: string; formSlug: string } }
 ) {
   try {
@@ -77,11 +78,34 @@ export async function GET(
       }
     }
 
-    // Check if password protected (return flag, don't block)
+    // Check if password protected
     const requiresPassword = !!form.passwordHash
 
+    // If password-protected, only return full data if a valid access token is provided
+    if (requiresPassword) {
+      const accessToken = _req.nextUrl.searchParams.get('accessToken')
+      if (!accessToken || !verifyAccessToken(accessToken, form.id)) {
+        // Return minimal data — don't reveal form fields
+        return NextResponse.json({
+          form: {
+            id: form.id,
+            title: form.title,
+            description: form.description,
+            requiresPassword: true,
+            fields: [],
+            screens: [],
+            theme: form.theme ? {
+              colors: form.theme.colors,
+              fonts: form.theme.fonts,
+              backgroundImage: form.theme.backgroundImage
+            } : null,
+            settings: {}
+          }
+        })
+      }
+    }
+
     // Return form data for public consumption
-    // Remove sensitive fields
     return NextResponse.json({
       form: {
         id: form.id,
@@ -118,7 +142,7 @@ export async function GET(
           allowMultipleResponses: settings?.allowMultipleResponses === true,
           randomizeQuestions: settings?.randomizeQuestions === true
         },
-        requiresPassword
+        requiresPassword: false
       }
     })
   } catch (error) {

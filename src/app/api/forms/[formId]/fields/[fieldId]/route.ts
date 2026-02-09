@@ -42,6 +42,7 @@ export async function PATCH(
     const field = await prisma.formField.update({
       where: {
         id: params.fieldId,
+        formId: params.formId,
       },
       data: {
         title: data.title,
@@ -106,6 +107,7 @@ export async function DELETE(
     await prisma.formField.delete({
       where: {
         id: params.fieldId,
+        formId: params.formId,
       },
     })
 

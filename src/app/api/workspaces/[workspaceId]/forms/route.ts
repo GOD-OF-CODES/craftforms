@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { verifyWorkspaceAccess } from '@/lib/authz'
 
 function generateSlug(title: string): string {
   return title
@@ -20,6 +21,13 @@ export async function GET(
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Verify workspace membership
+    const workspace = await verifyWorkspaceAccess(params.workspaceId, session.user.id)
+
+    if (!workspace) {
+      return NextResponse.json({ error: 'Workspace not found' }, { status: 404 })
     }
 
     const forms = await prisma.form.findMany({
@@ -52,6 +60,13 @@ export async function POST(
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Verify workspace membership
+    const workspace = await verifyWorkspaceAccess(params.workspaceId, session.user.id)
+
+    if (!workspace) {
+      return NextResponse.json({ error: 'Workspace not found' }, { status: 404 })
     }
 
     const { title, description } = await req.json()

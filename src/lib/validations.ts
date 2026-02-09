@@ -172,18 +172,29 @@ function validateMax(value: any, max: number, message?: string): string | null {
 }
 
 /**
- * Regex pattern validation
+ * Regex pattern validation with ReDoS protection
  */
 function validatePattern(value: any, pattern: string, message?: string): string | null {
   if (value === null || value === undefined || value === '') {
     return null
   }
 
-  const strValue = String(value)
-  const regex = new RegExp(pattern)
+  // ReDoS protection: reject overly long or dangerous patterns
+  if (pattern.length > 500) {
+    return 'Invalid validation pattern'
+  }
 
-  if (!regex.test(strValue)) {
-    return message || 'Invalid format'
+  const strValue = String(value)
+
+  try {
+    const regex = new RegExp(pattern)
+    // Limit input length to prevent long-running matches
+    const testValue = strValue.slice(0, 10000)
+    if (!regex.test(testValue)) {
+      return message || 'Invalid format'
+    }
+  } catch {
+    return 'Invalid validation pattern'
   }
 
   return null

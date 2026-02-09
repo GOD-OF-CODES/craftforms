@@ -51,6 +51,14 @@ const config: Config = {
         'fade-in': 'fadeIn 200ms ease-out',
         'slide-up': 'slideUp 300ms ease-out',
         'slide-down': 'slideDown 300ms ease-out',
+        'float': 'gameFloat 3s ease-in-out infinite',
+        'float-slow': 'gameFloat 4.5s ease-in-out infinite',
+        'drift': 'drift 35s linear infinite',
+        'drift-slow': 'drift 50s linear infinite',
+        'drift-reverse': 'driftReverse 40s linear infinite',
+        'pulse-soft': 'pulseSoft 4s ease-in-out infinite',
+        'wiggle': 'wiggle 6s ease-in-out infinite',
+        'spin-slow': 'spin 12s linear infinite',
       },
       keyframes: {
         fadeIn: {
@@ -64,6 +72,27 @@ const config: Config = {
         slideDown: {
           '0%': { transform: 'translateY(-10px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        gameFloat: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-12px)' },
+        },
+        drift: {
+          '0%': { transform: 'translateX(-150px)' },
+          '100%': { transform: 'translateX(calc(100vw + 150px))' },
+        },
+        driftReverse: {
+          '0%': { transform: 'translateX(calc(100vw + 150px))' },
+          '100%': { transform: 'translateX(-150px)' },
+        },
+        pulseSoft: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.02)' },
+        },
+        wiggle: {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '25%': { transform: 'rotate(2deg)' },
+          '75%': { transform: 'rotate(-2deg)' },
         },
       },
     },

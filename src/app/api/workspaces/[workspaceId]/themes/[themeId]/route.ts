@@ -62,7 +62,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Verify theme ownership
+    // Verify theme exists in workspace
     const theme = await prisma.theme.findFirst({
       where: {
         id: params.themeId,
@@ -72,6 +72,21 @@ export async function PATCH(
 
     if (!theme) {
       return NextResponse.json({ error: 'Theme not found' }, { status: 404 })
+    }
+
+    // Verify user is workspace admin/owner or theme creator
+    const workspace = await prisma.workspace.findFirst({
+      where: {
+        id: params.workspaceId,
+        OR: [
+          { ownerId: session.user.id },
+          { members: { some: { userId: session.user.id, role: { in: ['admin', 'editor'] } } } }
+        ]
+      }
+    })
+
+    if (!workspace && theme.createdBy !== session.user.id) {
+      return NextResponse.json({ error: 'Permission denied' }, { status: 403 })
     }
 
     const body = await req.json()
@@ -128,8 +143,23 @@ export async function DELETE(
       return NextResponse.json({ error: 'Theme not found' }, { status: 404 })
     }
 
-    // Check if the user is the creator or workspace owner
+    // Verify user is a current workspace member
     const workspace = await prisma.workspace.findFirst({
+      where: {
+        id: params.workspaceId,
+        OR: [
+          { ownerId: session.user.id },
+          { members: { some: { userId: session.user.id } } }
+        ]
+      }
+    })
+
+    if (!workspace) {
+      return NextResponse.json({ error: 'Permission denied' }, { status: 403 })
+    }
+
+    // Only workspace admin/owner or theme creator can delete
+    const isAdmin = await prisma.workspace.findFirst({
       where: {
         id: params.workspaceId,
         OR: [
@@ -139,7 +169,7 @@ export async function DELETE(
       }
     })
 
-    if (!workspace && theme.createdBy !== session.user.id) {
+    if (!isAdmin && theme.createdBy !== session.user.id) {
       return NextResponse.json({ error: 'Permission denied' }, { status: 403 })
     }
 

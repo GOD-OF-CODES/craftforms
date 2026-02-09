@@ -7,6 +7,13 @@ export function middleware(_request: NextRequest) {
 
   // Apply security headers to all matched routes
   Object.entries(securityHeaders).forEach(([key, value]) => {
+    // In development, Next.js React Refresh requires 'unsafe-eval'
+    if (key === 'Content-Security-Policy' && process.env.NODE_ENV === 'development') {
+      value = value.replace(
+        "script-src 'self' 'unsafe-inline'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+      )
+    }
     response.headers.set(key, value)
   })
 

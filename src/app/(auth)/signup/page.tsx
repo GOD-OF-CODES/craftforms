@@ -33,8 +33,10 @@ export default function SignupPage() {
 
     if (!password) {
       newErrors.password = 'Password is required'
-    } else if (password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters'
+    } else if (password.length < 10) {
+      newErrors.password = 'Password must be at least 10 characters'
+    } else if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+      newErrors.password = 'Password must contain uppercase, lowercase, and a number'
     }
 
     if (password !== confirmPassword) {

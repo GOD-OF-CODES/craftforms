@@ -32,6 +32,20 @@ export async function POST(req: Request) {
       )
     }
 
+    if (typeof password !== 'string' || password.length < 10) {
+      return NextResponse.json(
+        { error: 'Password must be at least 10 characters' },
+        { status: 400 }
+      )
+    }
+
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+      return NextResponse.json(
+        { error: 'Password must contain uppercase, lowercase, and a number' },
+        { status: 400 }
+      )
+    }
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
@@ -106,10 +120,26 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     )
-  } catch (error) {
+  } catch (error: any) {
     console.error('Signup error:', error)
+
+    // Provide more specific error messages for common failures
+    if (error?.code === 'P2002') {
+      return NextResponse.json(
+        { error: 'User already exists with this email' },
+        { status: 400 }
+      )
+    }
+
+    if (error?.code === 'P1001' || error?.code === 'P1002') {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable. Please try again later.' },
+        { status: 503 }
+      )
+    }
+
     return NextResponse.json(
-      { error: 'An error occurred during signup' },
+      { error: 'An error occurred during signup. Please try again.' },
       { status: 500 }
     )
   }

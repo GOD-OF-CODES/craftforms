@@ -34,13 +34,11 @@ export async function GET(
 
     // Parse query params
     const { searchParams } = new URL(req.url)
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1') || 1)
-    const limit = Math.min(Math.max(1, parseInt(searchParams.get('limit') || '20') || 20), 100)
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '20')
     const status = searchParams.get('status') // 'completed' | 'incomplete'
-    const allowedSortFields = ['createdAt', 'updatedAt', 'isCompleted', 'timeTaken']
-    const rawSortBy = searchParams.get('sortBy') || 'createdAt'
-    const sortBy = allowedSortFields.includes(rawSortBy) ? rawSortBy : 'createdAt'
-    const sortOrder = searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc'
+    const sortBy = searchParams.get('sortBy') || 'createdAt'
+    const sortOrder = searchParams.get('sortOrder') || 'desc'
     const startDate = searchParams.get('startDate')
     const endDate = searchParams.get('endDate')
 
@@ -56,16 +54,10 @@ export async function GET(
     if (startDate || endDate) {
       where.createdAt = {}
       if (startDate) {
-        const parsed = new Date(startDate)
-        if (!isNaN(parsed.getTime())) {
-          (where.createdAt as Record<string, Date>).gte = parsed
-        }
+        (where.createdAt as Record<string, Date>).gte = new Date(startDate)
       }
       if (endDate) {
-        const parsed = new Date(endDate)
-        if (!isNaN(parsed.getTime())) {
-          (where.createdAt as Record<string, Date>).lte = parsed
-        }
+        (where.createdAt as Record<string, Date>).lte = new Date(endDate)
       }
     }
 

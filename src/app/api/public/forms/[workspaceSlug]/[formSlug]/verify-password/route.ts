@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
-import { checkRateLimit, getClientIdentifier, rateLimitConfigs } from '@/lib/rateLimit'
-import { generateAccessToken } from '@/lib/formAccessToken'
 
 // POST /api/public/forms/[workspaceSlug]/[formSlug]/verify-password
 export async function POST(
@@ -10,16 +8,6 @@ export async function POST(
   { params }: { params: { workspaceSlug: string; formSlug: string } }
 ) {
   try {
-    // Rate limit password attempts
-    const clientId = getClientIdentifier(req)
-    const rateCheck = checkRateLimit(`pw:${clientId}:${params.formSlug}`, rateLimitConfigs.auth)
-    if (!rateCheck.allowed) {
-      return NextResponse.json(
-        { error: 'Too many attempts. Please try again later.' },
-        { status: 429 }
-      )
-    }
-
     const body = await req.json()
     const { password } = body
 
@@ -63,13 +51,12 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
     }
 
-    // Return a signed HMAC access token
-    const accessToken = generateAccessToken(form.id)
-
+    // Return a token that can be used to access the form
+    // In a production app, this would be a JWT or session token
+    // For now, we'll return a simple success response
     return NextResponse.json({
       success: true,
-      formId: form.id,
-      accessToken
+      formId: form.id
     })
   } catch (error) {
     console.error('Verify password error:', error)

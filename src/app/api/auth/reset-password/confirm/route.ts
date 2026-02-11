@@ -1,20 +1,9 @@
 import { NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
-import { checkRateLimit, getClientIdentifier, rateLimitConfigs } from '@/lib/rateLimit'
 
 export async function POST(req: Request) {
   try {
-    // Rate limit token validation attempts
-    const clientId = getClientIdentifier(req)
-    const rateCheck = checkRateLimit(`reset-confirm:${clientId}`, rateLimitConfigs.auth)
-    if (!rateCheck.allowed) {
-      return NextResponse.json(
-        { error: 'Too many attempts. Please try again later.' },
-        { status: 429 }
-      )
-    }
-
     const { token, password } = await req.json()
 
     if (!token || !password) {

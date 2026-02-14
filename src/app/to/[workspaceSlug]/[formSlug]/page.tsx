@@ -84,7 +84,7 @@ export default function PublicFormPage({
   }, [params.workspaceSlug, params.formSlug])
 
   const handleSubmit = async (answers: Record<string, unknown>): Promise<void> => {
-    const response = await fetch(`/api/public/forms/${form?.id}/submit`, {
+    const response = await fetch(`/api/public/submit/${form?.id}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ answers })

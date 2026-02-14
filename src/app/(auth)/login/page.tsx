@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isDemoLoading, setIsDemoLoading] = useState(false)
   const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -52,6 +53,42 @@ export default function LoginPage() {
       })
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleDemoLogin = async () => {
+    setIsDemoLoading(true)
+    setError('')
+    try {
+      // Create demo account if needed
+      const demoRes = await fetch('/api/auth/demo-login', { method: 'POST' })
+      if (!demoRes.ok) {
+        throw new Error('Failed to create demo account')
+      }
+      const { email: demoEmail, password: demoPassword } = await demoRes.json()
+
+      // Sign in with demo credentials
+      const result = await signIn('credentials', {
+        email: demoEmail,
+        password: demoPassword,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        setError('Demo login failed. Please try again.')
+      } else {
+        addToast({
+          title: 'Welcome to the Demo!',
+          description: 'Explore the form builder with sample data.',
+          variant: 'success',
+        })
+        router.push('/dashboard')
+        router.refresh()
+      }
+    } catch {
+      setError('Failed to start demo. Please try again.')
+    } finally {
+      setIsDemoLoading(false)
     }
   }
 
@@ -184,6 +221,29 @@ export default function LoginPage() {
               Sign up
             </Link>
           </p>
+
+          {/* Demo Login */}
+          <div className="mt-6 pt-6 border-t border-border">
+            <Button
+              type="button"
+              variant="secondary"
+              className="w-full"
+              onClick={handleDemoLogin}
+              isLoading={isDemoLoading}
+              disabled={isLoading || isDemoLoading}
+            >
+              {!isDemoLoading && (
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
+              Try Demo Account
+            </Button>
+            <p className="mt-2 text-center text-xs text-text-secondary">
+              Explore with sample forms and responses
+            </p>
+          </div>
         </div>
       </div>
     </div>

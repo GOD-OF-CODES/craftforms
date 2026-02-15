@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 
 interface SidebarProps {
   workspaceSlug: string
@@ -9,6 +10,7 @@ interface SidebarProps {
 
 const Sidebar = ({ workspaceSlug }: SidebarProps) => {
   const pathname = usePathname()
+  const { data: session } = useSession()
 
   const navigation = [
     {
@@ -106,11 +108,17 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
       <div className="p-4 border-t border-border">
         <div className="flex items-center gap-3 px-4 py-3">
           <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-            <span className="text-primary font-semibold text-sm">U</span>
+            <span className="text-primary font-semibold text-sm">
+              {session?.user?.name?.[0]?.toUpperCase() || session?.user?.email?.[0]?.toUpperCase() || 'U'}
+            </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-text-primary truncate">User Name</p>
-            <p className="text-xs text-text-secondary truncate">user@example.com</p>
+            <p className="text-sm font-medium text-text-primary truncate">
+              {session?.user?.name || 'User'}
+            </p>
+            <p className="text-xs text-text-secondary truncate">
+              {session?.user?.email || ''}
+            </p>
           </div>
         </div>
       </div>

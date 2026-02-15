@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Badge from '@/components/ui/badge'
 import Card from '@/components/ui/card'
+import { useToast } from '@/components/ui/toast'
 
 interface FormWithResponses {
   id: string
@@ -20,8 +21,10 @@ export default function WorkspaceResponsesPage({
   params: { workspaceSlug: string }
 }) {
   const { workspaceSlug } = params
+  const { addToast } = useToast()
   const [forms, setForms] = useState<FormWithResponses[]>([])
   const [loading, setLoading] = useState(true)
+  const [exportingFormId, setExportingFormId] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchForms = async () => {
@@ -39,6 +42,46 @@ export default function WorkspaceResponsesPage({
     }
     fetchForms()
   }, [workspaceSlug])
+
+  const handleExportCSV = async (formId: string, formTitle: string) => {
+    setExportingFormId(formId)
+    try {
+      const response = await fetch(`/api/forms/${formId}/responses/export`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ format: 'csv' })
+      })
+
+      if (!response.ok) {
+        throw new Error('Export failed')
+      }
+
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${formTitle || 'responses'}-export-${new Date().toISOString().split('T')[0]}.csv`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      addToast({
+        title: 'Export successful',
+        description: `Responses for "${formTitle}" exported as CSV.`,
+        variant: 'success'
+      })
+    } catch (error) {
+      console.error('Export error:', error)
+      addToast({
+        title: 'Error',
+        description: 'Failed to export responses.',
+        variant: 'error'
+      })
+    } finally {
+      setExportingFormId(null)
+    }
+  }
 
   const totalResponses = forms.reduce((sum, f) => sum + f.responseCount, 0)
   const totalCompleted = forms.reduce((sum, f) => sum + f.completedCount, 0)
@@ -132,12 +175,26 @@ export default function WorkspaceResponsesPage({
                         : 'Never'}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <Link
-                        href={`/${workspaceSlug}/forms/${form.id}/responses`}
-                        className="text-primary hover:text-primary-hover font-medium text-sm"
-                      >
-                        View responses
-                      </Link>
+                      <div className="flex items-center justify-end gap-3">
+                        {form.responseCount > 0 && (
+                          <button
+                            onClick={() => handleExportCSV(form.id, form.title)}
+                            disabled={exportingFormId === form.id}
+                            className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 disabled:opacity-50"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            {exportingFormId === form.id ? 'Exporting...' : 'Export CSV'}
+                          </button>
+                        )}
+                        <Link
+                          href={`/${workspaceSlug}/forms/${form.id}/responses`}
+                          className="text-primary hover:text-primary-hover font-medium text-sm"
+                        >
+                          View responses
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 )

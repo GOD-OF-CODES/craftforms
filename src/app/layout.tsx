@@ -1,6 +1,7 @@
 'use client'
 
 import { Inter } from 'next/font/google'
+import { SessionProvider } from 'next-auth/react'
 import './globals.css'
 import { ToastProvider } from '@/components/ui/toast'
 
@@ -14,9 +15,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ToastProvider>
-          {children}
-        </ToastProvider>
+        <SessionProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </SessionProvider>
       </body>
     </html>
   )

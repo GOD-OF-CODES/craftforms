@@ -271,8 +271,8 @@ const FormRenderer = ({
     })
   }
 
-  // Thank you screen
-  if (isSubmitted && thankYouScreen?.enabled) {
+  // Thank you screen (show default if none configured)
+  if (isSubmitted && thankYouScreen?.enabled !== false) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <motion.div
@@ -296,9 +296,9 @@ const FormRenderer = ({
             </svg>
           </div>
           <h1 className="text-3xl font-bold text-text-primary mb-4">
-            {thankYouScreen.title || 'Thank you!'}
+            {thankYouScreen?.title || 'Thank you!'}
           </h1>
-          {thankYouScreen.description && (
+          {thankYouScreen?.description && (
             <p className="text-lg text-text-secondary">
               {thankYouScreen.description}
             </p>

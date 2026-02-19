@@ -90,9 +90,9 @@ export default function WorkspaceResponsesPage({
     return (
       <div className="p-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-32 bg-gray-200 rounded"></div>
-          <div className="h-64 bg-gray-200 rounded"></div>
+          <div className="h-8 bg-gray-200 rounded-xl w-1/4"></div>
+          <div className="h-32 bg-gray-200 rounded-xl"></div>
+          <div className="h-64 bg-gray-200 rounded-xl"></div>
         </div>
       </div>
     )
@@ -101,71 +101,67 @@ export default function WorkspaceResponsesPage({
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">All Responses</h1>
+        <h1 className="text-2xl font-bold text-gray-900"><span className="mr-2">📊</span>All Responses</h1>
         <p className="text-gray-500 mt-1">View and manage responses across all forms</p>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
+        <Card variant="dashboard" className="stagger-enter" style={{ animationDelay: '0s' }}>
           <div className="text-center">
-            <p className="text-3xl font-bold text-gray-900">{totalResponses}</p>
-            <p className="text-gray-500">Total Responses</p>
+            <p className="text-sm text-gray-500 mb-1">Total Responses</p>
+            <p className="text-3xl font-bold stat-indigo">{totalResponses}</p>
           </div>
         </Card>
-        <Card>
+        <Card variant="dashboard" className="stagger-enter" style={{ animationDelay: '0.1s' }}>
           <div className="text-center">
-            <p className="text-3xl font-bold text-green-600">{totalCompleted}</p>
-            <p className="text-gray-500">Completed</p>
+            <p className="text-sm text-gray-500 mb-1">Completed</p>
+            <p className="text-3xl font-bold stat-emerald">{totalCompleted}</p>
           </div>
         </Card>
-        <Card>
+        <Card variant="dashboard" className="stagger-enter" style={{ animationDelay: '0.2s' }}>
           <div className="text-center">
-            <p className="text-3xl font-bold text-gray-900">{forms.length}</p>
-            <p className="text-gray-500">Forms with Responses</p>
+            <p className="text-sm text-gray-500 mb-1">Forms with Responses</p>
+            <p className="text-3xl font-bold stat-blue">{forms.length}</p>
           </div>
         </Card>
       </div>
 
       {/* Forms List */}
       {forms.length === 0 ? (
-        <Card className="text-center py-12">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No responses yet</h3>
+        <Card variant="dashboard" className="text-center py-12">
+          <div className="text-5xl mb-4">📭</div>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">No responses yet</h3>
           <p className="text-gray-500">Create and share forms to start collecting responses.</p>
         </Card>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="dashboard-table">
           <table className="w-full">
-            <thead className="bg-gray-50">
+            <thead>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Form</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Responses</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Completion Rate</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Last Response</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase">Form</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase">Responses</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase">Completion Rate</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase">Last Response</th>
+                <th className="px-6 py-3 text-right text-xs font-medium uppercase">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-100">
               {forms.map((form) => {
                 const completionRate = form.responseCount > 0
                   ? Math.round((form.completedCount / form.responseCount) * 100)
                   : 0
                 return (
-                  <tr key={form.id} className="hover:bg-gray-50">
+                  <tr key={form.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4">
                       <p className="font-medium text-gray-900">{form.title}</p>
-                      <p className="text-sm text-gray-500">{form.slug}</p>
+                      <p className="text-sm text-gray-400">{form.slug}</p>
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-gray-900 font-medium">{form.responseCount}</span>
                     </td>
                     <td className="px-6 py-4">
-                      <Badge variant={completionRate >= 80 ? 'success' : completionRate >= 50 ? 'warning' : 'default'}>
+                      <Badge variant={completionRate >= 80 ? 'dashboard-success' : completionRate >= 50 ? 'dashboard-warning' : 'dashboard-default'}>
                         {completionRate}%
                       </Badge>
                     </td>
@@ -180,7 +176,7 @@ export default function WorkspaceResponsesPage({
                           <button
                             onClick={() => handleExportCSV(form.id, form.title)}
                             disabled={exportingFormId === form.id}
-                            className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-gray-900 disabled:opacity-50"
+                            className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 disabled:opacity-50 transition-colors"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -190,7 +186,7 @@ export default function WorkspaceResponsesPage({
                         )}
                         <Link
                           href={`/${workspaceSlug}/forms/${form.id}/responses`}
-                          className="text-primary hover:text-primary-hover font-medium text-sm"
+                          className="text-indigo-600 hover:text-indigo-700 font-medium text-sm transition-colors"
                         >
                           View responses
                         </Link>

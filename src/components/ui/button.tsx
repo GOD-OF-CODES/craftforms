@@ -2,7 +2,7 @@ import { ButtonHTMLAttributes, forwardRef } from 'react'
 import { motion } from 'framer-motion'
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'game' | 'game-secondary' | 'game-danger' | 'dashboard-primary' | 'dashboard-secondary' | 'dashboard-danger'
   size?: 'sm' | 'md' | 'lg'
   isLoading?: boolean
 }
@@ -16,6 +16,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       secondary: 'bg-surface hover:bg-border text-text-primary border border-border',
       ghost: 'hover:bg-surface text-text-primary',
       danger: 'bg-error hover:bg-red-600 text-white focus-visible:outline-error',
+      game: 'bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white font-bold game-btn',
+      'game-secondary': 'bg-white hover:bg-gray-50 text-gray-900 font-bold game-btn',
+      'game-danger': 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold game-btn',
+      'dashboard-primary': 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold shadow-md shadow-indigo-500/20',
+      'dashboard-secondary': 'bg-white hover:bg-gray-50 text-gray-700 border border-gray-300',
+      'dashboard-danger': 'bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-semibold shadow-md shadow-red-500/20',
     }
 
     const sizeStyles = {
@@ -24,6 +30,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       lg: 'px-6 py-3 text-lg',
     }
 
+    const isGameVariant = variant === 'game' || variant === 'game-secondary' || variant === 'game-danger'
+
     const MotionButton = motion.button as any
 
     return (
@@ -31,8 +39,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
         disabled={disabled || isLoading}
-        whileHover={{ scale: disabled || isLoading ? 1 : 1.02 }}
-        whileTap={{ scale: disabled || isLoading ? 1 : 0.98 }}
+        whileHover={isGameVariant ? undefined : { scale: disabled || isLoading ? 1 : 1.02 }}
+        whileTap={isGameVariant ? undefined : { scale: disabled || isLoading ? 1 : 0.98 }}
         {...props}
       >
         {isLoading ? (

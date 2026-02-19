@@ -1,7 +1,7 @@
 import { HTMLAttributes, forwardRef } from 'react'
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'bordered' | 'elevated'
+  variant?: 'default' | 'bordered' | 'elevated' | 'game' | 'game-sm' | 'dashboard'
 }
 
 const Card = forwardRef<HTMLDivElement, CardProps>(
@@ -10,6 +10,9 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
       default: 'bg-surface border border-border',
       bordered: 'bg-background border-2 border-border',
       elevated: 'bg-background shadow-lg border border-border/50',
+      game: 'bg-white game-card',
+      'game-sm': 'bg-white game-card-sm',
+      dashboard: 'bg-white dashboard-card',
     }
 
     return (

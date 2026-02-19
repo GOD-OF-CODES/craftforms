@@ -116,14 +116,19 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
   ]
 
   return (
-    <aside className="w-64 bg-surface border-r border-border h-screen sticky top-0 flex flex-col">
+    <aside className="w-64 dashboard-sidebar h-screen sticky top-0 flex flex-col relative z-20">
       {/* Logo */}
-      <div className="p-6 border-b border-border">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+      <div className="p-6 border-b border-indigo-500/20">
+        <Link href="/" className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center relative"
+            style={{
+              background: 'linear-gradient(135deg, #6366F1 0%, #A855F7 100%)',
+              boxShadow: '0 0 16px rgba(99,102,241,0.3)',
+            }}
+          >
             <span className="text-white font-bold text-lg">C</span>
           </div>
-          <span className="text-xl font-bold text-text-primary">CraftForms</span>
+          <span className="text-lg font-bold text-white tracking-tight">CraftForms</span>
         </Link>
       </div>
 
@@ -135,33 +140,33 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
               <Link
                 href={item.href}
                 className={`
-                  flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
+                  flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
                   ${
                     isActive(item.href)
-                      ? 'bg-primary text-white'
-                      : 'text-text-secondary hover:bg-border hover:text-text-primary'
+                      ? 'nav-active text-indigo-300 font-semibold'
+                      : 'text-white/40 hover:bg-white/[0.04] hover:text-white/80'
                   }
                 `}
               >
                 {item.icon}
-                <span className="font-medium">{item.name}</span>
+                <span className="font-medium text-sm">{item.name}</span>
               </Link>
             </li>
           ))}
         </ul>
       </nav>
 
-      {/* Footer with profile menu */}
-      <div className="relative p-4 border-t border-border" ref={menuRef}>
-        {/* Profile popup menu */}
+      {/* Footer with profile + XP */}
+      <div className="relative p-4 border-t border-indigo-500/20" ref={menuRef}>
+        {/* Profile popup menu — light theme popup */}
         {showProfileMenu && (
-          <div className="absolute bottom-full left-4 right-4 mb-2 bg-surface border border-border rounded-lg shadow-lg overflow-hidden z-50">
+          <div className="absolute bottom-full left-4 right-4 mb-2 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
             {/* User info header */}
-            <div className="px-4 py-3 border-b border-border">
-              <p className="text-sm font-medium text-text-primary truncate">
+            <div className="px-4 py-3 border-b border-gray-100">
+              <p className="text-sm font-medium text-gray-900 truncate">
                 {session?.user?.name || 'User'}
               </p>
-              <p className="text-xs text-text-secondary truncate">
+              <p className="text-xs text-gray-500 truncate">
                 {session?.user?.email || ''}
               </p>
             </div>
@@ -173,7 +178,7 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
                   key={item.label}
                   href={item.href}
                   onClick={() => setShowProfileMenu(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-text-secondary hover:bg-border hover:text-text-primary transition-colors"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
                 >
                   {item.icon}
                   {item.label}
@@ -182,10 +187,10 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
             </div>
 
             {/* Logout */}
-            <div className="border-t border-border py-1">
+            <div className="border-t border-gray-100 py-1">
               <button
                 onClick={() => signOut({ callbackUrl: '/login' })}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-error hover:bg-error/10 transition-colors w-full"
+                className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors w-full"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -196,25 +201,42 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
           </div>
         )}
 
+        {/* XP Progress */}
+        <div className="mb-3 px-1">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="level-badge">LVL 7</span>
+            <span className="text-[10px] text-white/30 font-mono">2,450 / 3,000 XP</span>
+          </div>
+          <div className="xp-bar">
+            <div className="xp-bar-fill" style={{ width: '82%' }} />
+          </div>
+        </div>
+
         {/* Profile button */}
         <button
           onClick={() => setShowProfileMenu(!showProfileMenu)}
-          className="flex items-center gap-3 px-4 py-3 w-full rounded-lg hover:bg-border transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl hover:bg-white/[0.04] transition-colors"
         >
-          <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-            <span className="text-primary font-semibold text-sm">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+            style={{
+              background: 'linear-gradient(135deg, rgba(99,102,241,0.3), rgba(168,85,247,0.3))',
+              border: '1px solid rgba(99,102,241,0.2)',
+            }}
+          >
+            <span className="text-indigo-300 font-semibold text-sm">
               {session?.user?.name?.[0]?.toUpperCase() || session?.user?.email?.[0]?.toUpperCase() || 'U'}
             </span>
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <p className="text-sm font-medium text-text-primary truncate">
+            <p className="text-sm font-medium text-white/90 truncate">
               {session?.user?.name || 'User'}
             </p>
-            <p className="text-xs text-text-secondary truncate">
+            <p className="text-xs text-white/30 truncate">
               {session?.user?.email || ''}
             </p>
           </div>
-          <svg className={`w-4 h-4 text-text-secondary transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`w-4 h-4 text-white/30 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
           </svg>
         </button>

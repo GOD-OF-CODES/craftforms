@@ -164,12 +164,12 @@ export default function WorkspacePage({
     return (
       <div className="p-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-          <div className="h-12 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-8 bg-gray-200 rounded-xl w-1/4"></div>
+          <div className="h-12 bg-gray-200 rounded-xl w-1/3"></div>
           <div className="grid grid-cols-3 gap-6">
-            <div className="h-48 bg-gray-200 rounded"></div>
-            <div className="h-48 bg-gray-200 rounded"></div>
-            <div className="h-48 bg-gray-200 rounded"></div>
+            <div className="h-48 bg-gray-200 rounded-xl"></div>
+            <div className="h-48 bg-gray-200 rounded-xl"></div>
+            <div className="h-48 bg-gray-200 rounded-xl"></div>
           </div>
         </div>
       </div>
@@ -181,8 +181,10 @@ export default function WorkspacePage({
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-text-primary mb-2">Forms</h1>
-          <p className="text-text-secondary">Create and manage your forms</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <span className="mr-2">📋</span>Forms
+          </h1>
+          <p className="text-gray-500">Create and manage your forms</p>
         </div>
 
         {/* Actions Bar */}
@@ -194,7 +196,7 @@ export default function WorkspacePage({
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button onClick={handleCreateForm}>
+          <Button variant="dashboard-primary" onClick={handleCreateForm}>
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
@@ -205,19 +207,20 @@ export default function WorkspacePage({
         {/* Forms Grid */}
         {filteredForms.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredForms.map((form) => (
-              <Card key={form.id} className="hover:shadow-lg transition-shadow">
+            {filteredForms.map((form, index) => (
+              <Card key={form.id} variant="dashboard" className="stagger-enter" style={{ animationDelay: `${index * 0.07}s` }}>
                 <div className="flex items-start justify-between mb-4">
                   <Link href={`/${params.workspaceSlug}/forms/${form.id}/edit`} className="flex-1">
-                    <h3 className="text-lg font-semibold text-text-primary mb-1 hover:text-primary">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1 hover:text-indigo-600 transition-colors">
                       {form.title}
                     </h3>
-                    <p className="text-sm text-text-secondary">/{form.slug}</p>
+                    <p className="text-sm text-gray-400">/{form.slug}</p>
                   </Link>
                   <DropdownMenu
+                    menuVariant="dashboard"
                     trigger={
-                      <button className="p-1 hover:bg-border rounded transition-colors">
-                        <svg className="w-5 h-5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <button className="p-1 hover:bg-gray-100 rounded transition-colors">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                         </svg>
                       </button>
@@ -241,16 +244,16 @@ export default function WorkspacePage({
                 </div>
 
                 <div className="flex items-center gap-4 mb-4">
-                  <Badge variant={form.isPublished ? 'success' : 'default'}>
+                  <Badge variant={form.isPublished ? 'dashboard-success' : 'dashboard-default'}>
                     {form.isPublished ? 'Published' : 'Draft'}
                   </Badge>
-                  <span className="text-sm text-text-secondary">
+                  <span className="text-sm text-gray-500">
                     {form.responseCount} responses
                   </span>
                 </div>
 
-                <div className="pt-4 border-t border-border">
-                  <div className="flex items-center justify-between text-xs text-text-secondary">
+                <div className="pt-4 border-t border-gray-100">
+                  <div className="flex items-center justify-between text-xs text-gray-400">
                     <span>Updated {formatDate(form.updatedAt)}</span>
                     <span>Created {formatDate(form.createdAt)}</span>
                   </div>
@@ -259,20 +262,16 @@ export default function WorkspacePage({
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-surface rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-medium text-text-primary mb-2">No forms found</h3>
-            <p className="text-text-secondary mb-4">
+          <Card variant="dashboard" className="text-center py-12">
+            <div className="text-5xl mb-4">📝</div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">No forms found</h3>
+            <p className="text-gray-500 mb-4">
               {searchQuery ? 'Try a different search term' : 'Get started by creating your first form'}
             </p>
             {!searchQuery && (
-              <Button onClick={handleCreateForm}>Create New Form</Button>
+              <Button variant="dashboard-primary" onClick={handleCreateForm}>Create New Form</Button>
             )}
-          </div>
+          </Card>
         )}
       </div>
     </div>

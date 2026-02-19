@@ -100,20 +100,20 @@ export default function HelpPage() {
   return (
     <div className="max-w-3xl mx-auto p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-text-primary mb-2">Help & Support</h1>
-        <p className="text-text-secondary">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2"><span className="mr-2">💬</span>Help & Support</h1>
+        <p className="text-gray-500">
           Get help with CraftForms or reach out to our support team
         </p>
       </div>
 
       <div className="space-y-8">
         {/* Contact Form */}
-        <section className="bg-surface border border-border rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-text-primary mb-2">Contact Support</h2>
-          <p className="text-sm text-text-secondary mb-6">
+        <section className="dashboard-section p-6 stagger-enter" style={{ animationDelay: '0s' }}>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2 pl-4 relative section-accent">Contact Support</h2>
+          <p className="text-sm text-gray-500 mb-6">
             Send us a message and we&apos;ll get back to you as soon as possible.
             You can also email us directly at{' '}
-            <a href={`mailto:${SUPPORT_EMAIL}`} className="text-primary hover:underline">
+            <a href={`mailto:${SUPPORT_EMAIL}`} className="text-indigo-600 hover:underline">
               {SUPPORT_EMAIL}
             </a>
           </p>
@@ -125,7 +125,7 @@ export default function HelpPage() {
                 id="contact-from"
                 value={session?.user?.email || ''}
                 disabled
-                className="bg-background"
+                className="bg-gray-50"
               />
             </div>
 
@@ -135,7 +135,7 @@ export default function HelpPage() {
                 id="contact-category"
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
               >
                 {categories.map((cat) => (
                   <option key={cat.value} value={cat.value}>
@@ -165,33 +165,33 @@ export default function HelpPage() {
                 placeholder="Describe your issue or question in detail..."
                 maxLength={5000}
                 rows={6}
-                className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-vertical"
+                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors resize-vertical placeholder:text-gray-400"
               />
-              <p className="text-xs text-text-secondary mt-1">
+              <p className="text-xs text-gray-400 mt-1">
                 {form.message.length}/5000 characters
               </p>
             </div>
 
-            <Button onClick={handleSubmit} disabled={sending}>
+            <Button variant="dashboard-primary" onClick={handleSubmit} disabled={sending}>
               {sending ? 'Sending...' : 'Send Message'}
             </Button>
           </div>
         </section>
 
         {/* FAQ Section */}
-        <section className="bg-surface border border-border rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-text-primary mb-6">Frequently Asked Questions</h2>
+        <section className="dashboard-section p-6 stagger-enter" style={{ animationDelay: '0.1s' }}>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6 pl-4 relative section-accent">Frequently Asked Questions</h2>
 
           <div className="space-y-2">
             {faqs.map((faq, index) => (
-              <div key={index} className="border border-border rounded-lg overflow-hidden">
+              <div key={index} className="border border-gray-200 rounded-xl overflow-hidden">
                 <button
                   onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
-                  className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-background transition-colors"
+                  className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
                 >
-                  <span className="text-sm font-medium text-text-primary">{faq.question}</span>
+                  <span className="text-sm font-medium text-gray-900">{faq.question}</span>
                   <svg
-                    className={`w-4 h-4 text-text-secondary transition-transform flex-shrink-0 ml-2 ${
+                    className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 ml-2 ${
                       expandedFaq === index ? 'rotate-180' : ''
                     }`}
                     fill="none"
@@ -202,8 +202,8 @@ export default function HelpPage() {
                   </svg>
                 </button>
                 {expandedFaq === index && (
-                  <div className="px-4 py-3 border-t border-border bg-background">
-                    <p className="text-sm text-text-secondary">{faq.answer}</p>
+                  <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
+                    <p className="text-sm text-gray-600">{faq.answer}</p>
                   </div>
                 )}
               </div>
@@ -212,28 +212,28 @@ export default function HelpPage() {
         </section>
 
         {/* Direct Contact */}
-        <section className="bg-surface border border-border rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-text-primary mb-4">Other Ways to Reach Us</h2>
+        <section className="dashboard-section p-6 stagger-enter" style={{ animationDelay: '0.2s' }}>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 pl-4 relative section-accent">Other Ways to Reach Us</h2>
           <div className="space-y-3">
             <div className="flex items-center gap-3 py-2">
-              <svg className="w-5 h-5 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
               <div>
-                <p className="text-sm font-medium text-text-primary">Email</p>
-                <a href={`mailto:${SUPPORT_EMAIL}`} className="text-sm text-primary hover:underline">
+                <p className="text-sm font-medium text-gray-900">Email</p>
+                <a href={`mailto:${SUPPORT_EMAIL}`} className="text-sm text-indigo-600 hover:underline">
                   {SUPPORT_EMAIL}
                 </a>
               </div>
             </div>
-            <div className="border-t border-border" />
+            <div className="border-t border-gray-100" />
             <div className="flex items-center gap-3 py-2">
-              <svg className="w-5 h-5 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-indigo-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
-                <p className="text-sm font-medium text-text-primary">Response Time</p>
-                <p className="text-sm text-text-secondary">We typically respond within 24 hours</p>
+                <p className="text-sm font-medium text-gray-900">Response Time</p>
+                <p className="text-sm text-gray-500">We typically respond within 24 hours</p>
               </div>
             </div>
           </div>

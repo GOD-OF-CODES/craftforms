@@ -16,9 +16,10 @@ export interface DropdownMenuProps {
   items: DropdownMenuItem[]
   align?: 'left' | 'right'
   className?: string
+  menuVariant?: 'default' | 'game' | 'dashboard'
 }
 
-const DropdownMenu = ({ trigger, items, align = 'left', className = '' }: DropdownMenuProps) => {
+const DropdownMenu = ({ trigger, items, align = 'left', className = '', menuVariant = 'default' }: DropdownMenuProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -67,13 +68,21 @@ const DropdownMenu = ({ trigger, items, align = 'left', className = '' }: Dropdo
             exit={{ opacity: 0, scale: 0.95, y: -10 }}
             transition={{ duration: 0.1 }}
             className={`
-              absolute z-50 mt-2 w-56 rounded-lg border border-border bg-surface shadow-lg
+              absolute z-50 mt-2 w-56
+              ${menuVariant === 'game'
+                ? 'bg-white game-card-sm'
+                : menuVariant === 'dashboard'
+                ? 'bg-white border border-gray-200 rounded-xl shadow-lg'
+                : 'rounded-lg border border-border bg-surface shadow-lg'}
               ${align === 'right' ? 'right-0' : 'left-0'}
             `}
           >
             <div className="py-1">
               {items.map((item, index) => {
-                const variantStyles = item.variant === 'danger' ? 'text-error hover:bg-error/10' : 'text-text-primary hover:bg-border'
+                const isDashboard = menuVariant === 'dashboard'
+                const variantStyles = item.variant === 'danger'
+                  ? isDashboard ? 'text-red-600 hover:bg-red-50' : 'text-error hover:bg-error/10'
+                  : isDashboard ? 'text-gray-700 hover:bg-gray-50' : 'text-text-primary hover:bg-border'
 
                 return (
                   <button

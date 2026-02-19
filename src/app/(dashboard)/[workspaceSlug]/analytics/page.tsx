@@ -57,14 +57,14 @@ export default function WorkspaceAnalyticsPage({
     return (
       <div className="p-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-8 bg-gray-200 rounded-xl w-1/4"></div>
           <div className="grid grid-cols-4 gap-4">
-            <div className="h-24 bg-gray-200 rounded"></div>
-            <div className="h-24 bg-gray-200 rounded"></div>
-            <div className="h-24 bg-gray-200 rounded"></div>
-            <div className="h-24 bg-gray-200 rounded"></div>
+            <div className="h-24 bg-gray-200 rounded-xl"></div>
+            <div className="h-24 bg-gray-200 rounded-xl"></div>
+            <div className="h-24 bg-gray-200 rounded-xl"></div>
+            <div className="h-24 bg-gray-200 rounded-xl"></div>
           </div>
-          <div className="h-64 bg-gray-200 rounded"></div>
+          <div className="h-64 bg-gray-200 rounded-xl"></div>
         </div>
       </div>
     )
@@ -73,51 +73,47 @@ export default function WorkspaceAnalyticsPage({
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
+        <h1 className="text-2xl font-bold text-gray-900"><span className="mr-2">📈</span>Analytics</h1>
         <p className="text-gray-500 mt-1">Overview of all form performance</p>
       </div>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card>
+        <Card variant="dashboard" className="stagger-enter" style={{ animationDelay: '0s' }}>
           <div>
             <p className="text-sm text-gray-500 mb-1">Total Forms</p>
-            <p className="text-3xl font-bold text-gray-900">{forms.length}</p>
+            <p className="text-3xl font-bold stat-indigo">{forms.length}</p>
           </div>
         </Card>
-        <Card>
+        <Card variant="dashboard" className="stagger-enter" style={{ animationDelay: '0.07s' }}>
           <div>
             <p className="text-sm text-gray-500 mb-1">Total Responses</p>
-            <p className="text-3xl font-bold text-gray-900">{totalResponses}</p>
+            <p className="text-3xl font-bold stat-blue">{totalResponses}</p>
           </div>
         </Card>
-        <Card>
+        <Card variant="dashboard" className="stagger-enter" style={{ animationDelay: '0.14s' }}>
           <div>
             <p className="text-sm text-gray-500 mb-1">Completed</p>
-            <p className="text-3xl font-bold text-green-600">{totalCompleted}</p>
+            <p className="text-3xl font-bold stat-emerald">{totalCompleted}</p>
           </div>
         </Card>
-        <Card>
+        <Card variant="dashboard" className="stagger-enter" style={{ animationDelay: '0.21s' }}>
           <div>
             <p className="text-sm text-gray-500 mb-1">Completion Rate</p>
-            <p className="text-3xl font-bold text-primary">{overallCompletionRate}%</p>
+            <p className="text-3xl font-bold stat-indigo">{overallCompletionRate}%</p>
           </div>
         </Card>
       </div>
 
       {/* Forms Performance */}
       {forms.length === 0 ? (
-        <Card className="text-center py-12">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No analytics data</h3>
+        <Card variant="dashboard" className="text-center py-12">
+          <div className="text-5xl mb-4">📉</div>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">No analytics data</h3>
           <p className="text-gray-500">Create forms and collect responses to see analytics.</p>
         </Card>
       ) : (
-        <Card>
+        <Card variant="dashboard">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">Form Performance</h2>
           <div className="space-y-6">
             {forms.map((form) => {
@@ -129,7 +125,7 @@ export default function WorkspaceAnalyticsPage({
                   <div className="flex items-center justify-between mb-2">
                     <Link
                       href={`/${workspaceSlug}/forms/${form.id}/responses`}
-                      className="font-medium text-gray-900 hover:text-primary"
+                      className="font-medium text-gray-900 hover:text-indigo-600 transition-colors"
                     >
                       {form.title}
                     </Link>

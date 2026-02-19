@@ -158,24 +158,29 @@ export default function ProfilePage() {
   return (
     <div className="max-w-2xl mx-auto p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-text-primary mb-2">Profile</h1>
-        <p className="text-text-secondary">Manage your personal information and security settings</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2"><span className="mr-2">👤</span>Profile</h1>
+        <p className="text-gray-500">Manage your personal information and security settings</p>
       </div>
 
       <div className="space-y-8">
         {/* Avatar & Basic Info */}
-        <section className="bg-surface border border-border rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-text-primary mb-6">Personal Information</h2>
+        <section className="dashboard-section p-6 stagger-enter" style={{ animationDelay: '0s' }}>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6 pl-4 relative section-accent">Personal Information</h2>
 
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-primary font-bold text-2xl">
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center flex-shrink-0 ring-2 ring-indigo-100"
+              style={{
+                background: 'linear-gradient(135deg, #818CF8, #A855F7)',
+              }}
+            >
+              <span className="text-white font-bold text-2xl">
                 {profile.name?.[0]?.toUpperCase() || profile.email?.[0]?.toUpperCase() || 'U'}
               </span>
             </div>
             <div>
-              <p className="text-lg font-medium text-text-primary">{profile.name || 'User'}</p>
-              <p className="text-sm text-text-secondary">{profile.email}</p>
+              <p className="text-lg font-medium text-gray-900">{profile.name || 'User'}</p>
+              <p className="text-sm text-gray-500">{profile.email}</p>
             </div>
           </div>
 
@@ -199,21 +204,21 @@ export default function ProfilePage() {
                 onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                 placeholder="your@email.com"
               />
-              <p className="text-xs text-text-secondary mt-1">
+              <p className="text-xs text-gray-400 mt-1">
                 Changing your email will require you to log in again
               </p>
             </div>
 
-            <Button onClick={handleProfileSave} disabled={loading}>
+            <Button variant="dashboard-primary" onClick={handleProfileSave} disabled={loading}>
               {loading ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         </section>
 
         {/* Password Section */}
-        <section className="bg-surface border border-border rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-text-primary mb-2">Change Password</h2>
-          <p className="text-sm text-text-secondary mb-6">
+        <section className="dashboard-section p-6 stagger-enter" style={{ animationDelay: '0.1s' }}>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2 pl-4 relative section-accent">Change Password</h2>
+          <p className="text-sm text-gray-500 mb-6">
             Update your password to keep your account secure
           </p>
 
@@ -238,7 +243,7 @@ export default function ProfilePage() {
                 onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
                 placeholder="Enter new password"
               />
-              <p className="text-xs text-text-secondary mt-1">
+              <p className="text-xs text-gray-400 mt-1">
                 Minimum 10 characters with uppercase, lowercase, and a number
               </p>
             </div>
@@ -254,24 +259,24 @@ export default function ProfilePage() {
               />
             </div>
 
-            <Button onClick={handlePasswordChange} disabled={passwordLoading}>
+            <Button variant="dashboard-primary" onClick={handlePasswordChange} disabled={passwordLoading}>
               {passwordLoading ? 'Updating...' : 'Update Password'}
             </Button>
           </div>
         </section>
 
         {/* Account Info */}
-        <section className="bg-surface border border-border rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-text-primary mb-4">Account</h2>
+        <section className="dashboard-section p-6 stagger-enter" style={{ animationDelay: '0.2s' }}>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 pl-4 relative section-accent">Account</h2>
           <div className="space-y-3">
             <div className="flex justify-between items-center py-2">
-              <span className="text-sm text-text-secondary">Account ID</span>
-              <span className="text-sm text-text-primary font-mono">{session?.user?.id || '...'}</span>
+              <span className="text-sm text-gray-500">Account ID</span>
+              <span className="text-sm text-gray-700 font-mono">{session?.user?.id || '...'}</span>
             </div>
-            <div className="border-t border-border" />
+            <div className="border-t border-gray-100" />
             <div className="flex justify-between items-center py-2">
-              <span className="text-sm text-text-secondary">Authentication</span>
-              <span className="text-sm text-text-primary">Email & Password</span>
+              <span className="text-sm text-gray-500">Authentication</span>
+              <span className="text-sm text-gray-700">Email & Password</span>
             </div>
           </div>
         </section>

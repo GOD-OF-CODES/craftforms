@@ -132,10 +132,10 @@ export default function ThemesPage() {
     return (
       <div className="p-6">
         <div className="animate-pulse space-y-6">
-          <div className="h-8 w-32 bg-gray-200 rounded"></div>
+          <div className="h-8 w-32 bg-gray-200 rounded-xl"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} className="h-48 bg-gray-200 rounded-lg"></div>
+              <div key={i} className="h-48 bg-gray-200 rounded-xl"></div>
             ))}
           </div>
         </div>
@@ -146,8 +146,8 @@ export default function ThemesPage() {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Themes</h1>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
+        <h1 className="text-2xl font-bold text-gray-900"><span className="mr-2">🎨</span>Themes</h1>
+        <Button variant="dashboard-primary" onClick={() => setIsCreateModalOpen(true)}>
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
@@ -156,19 +156,15 @@ export default function ThemesPage() {
       </div>
 
       {themes.length === 0 ? (
-        <div className="text-center py-12 bg-white border border-gray-200 rounded-lg">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No themes yet</h3>
+        <div className="text-center py-12 dashboard-card">
+          <div className="text-5xl mb-4">🎨</div>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">No themes yet</h3>
           <p className="text-gray-500 mb-4">Create a custom theme to personalize your forms</p>
-          <Button onClick={() => setIsCreateModalOpen(true)}>Create Your First Theme</Button>
+          <Button variant="dashboard-primary" onClick={() => setIsCreateModalOpen(true)}>Create Your First Theme</Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {themes.map(theme => (
+          {themes.map((theme) => (
             <ThemeCard
               key={theme.id}
               theme={theme}
@@ -207,6 +203,7 @@ export default function ThemesPage() {
               Cancel
             </Button>
             <Button
+              variant="dashboard-primary"
               onClick={handleCreateTheme}
               disabled={!newThemeName.trim() || creating}
               isLoading={creating}
@@ -231,7 +228,7 @@ function ThemeCard({ theme, workspaceSlug, onDuplicate, onDelete }: ThemeCardPro
   const router = useRouter()
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+    <div className="dashboard-card overflow-hidden">
       {/* Theme Preview */}
       <div
         className="h-32 relative"
@@ -263,7 +260,7 @@ function ThemeCard({ theme, workspaceSlug, onDuplicate, onDelete }: ThemeCardPro
       <div className="p-4">
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-medium text-gray-900">{theme.name}</h3>
-          {theme.isPublic && <Badge variant="info">Public</Badge>}
+          {theme.isPublic && <Badge variant="dashboard-info">Public</Badge>}
         </div>
 
         <p className="text-sm text-gray-500 mb-4">
@@ -273,7 +270,7 @@ function ThemeCard({ theme, workspaceSlug, onDuplicate, onDelete }: ThemeCardPro
         {/* Actions */}
         <div className="flex items-center gap-2">
           <Button
-            variant="secondary"
+            variant="dashboard-secondary"
             size="sm"
             className="flex-1"
             onClick={() => router.push(`/${workspaceSlug}/themes/${theme.id}/edit`)}

@@ -199,11 +199,11 @@ export default function WorkspaceSettingsPage({ params }: { params: { workspaceS
   return (
     <div className="max-w-4xl mx-auto p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-text-primary mb-2">Workspace Settings</h1>
-        <p className="text-text-secondary">Manage your workspace configuration and preferences</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2"><span className="mr-2">&#x2699;&#xFE0F;</span>Workspace Settings</h1>
+        <p className="text-gray-500">Manage your workspace configuration and preferences</p>
       </div>
 
-      <Tabs defaultValue="general" className="space-y-6">
+      <Tabs defaultValue="general" className="space-y-6" variant="dashboard">
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="members">Members</TabsTrigger>
@@ -212,8 +212,8 @@ export default function WorkspaceSettingsPage({ params }: { params: { workspaceS
         <TabsContent value="general">
           <div className="space-y-8">
             {/* General Settings */}
-            <section className="bg-surface border border-border rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-text-primary mb-4">General</h2>
+            <section className="dashboard-section p-6 relative">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4 pl-4 relative section-accent">General</h2>
 
               <div className="space-y-4">
                 <div>
@@ -224,7 +224,7 @@ export default function WorkspaceSettingsPage({ params }: { params: { workspaceS
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="My Workspace"
                   />
-                  <p className="text-xs text-text-secondary mt-1">
+                  <p className="text-xs text-gray-400 mt-1">
                     The name of your workspace as it appears in the dashboard
                   </p>
                 </div>
@@ -237,12 +237,12 @@ export default function WorkspaceSettingsPage({ params }: { params: { workspaceS
                     onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                     placeholder="my-workspace"
                   />
-                  <p className="text-xs text-text-secondary mt-1">
-                    Used in URLs: example.com/<strong>{formData.slug || 'workspace-slug'}</strong>/forms
+                  <p className="text-xs text-gray-400 mt-1">
+                    Used in URLs: example.com/<strong className="text-gray-600">{formData.slug || 'workspace-slug'}</strong>/forms
                   </p>
                 </div>
 
-                <Button onClick={handleSave} disabled={loading}>
+                <Button variant="dashboard-primary" onClick={handleSave} disabled={loading}>
                   {loading ? 'Saving...' : 'Save Changes'}
                 </Button>
               </div>
@@ -250,12 +250,12 @@ export default function WorkspaceSettingsPage({ params }: { params: { workspaceS
 
             {/* Danger Zone */}
             {currentUserRole === 'owner' && (
-              <section className="bg-surface border border-error rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-error mb-4">Danger Zone</h2>
+              <section className="dashboard-section p-6" style={{ borderColor: 'rgba(239,68,68,0.3)' }}>
+                <h2 className="text-xl font-semibold text-red-600 mb-4">Danger Zone</h2>
 
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm text-text-primary mb-4">
+                    <p className="text-sm text-gray-600 mb-4">
                       Deleting a workspace is permanent and cannot be undone. All forms, responses, and settings will be permanently deleted.
                     </p>
 
@@ -270,7 +270,7 @@ export default function WorkspaceSettingsPage({ params }: { params: { workspaceS
                   </div>
 
                   <Button
-                    variant="danger"
+                    variant="dashboard-danger"
                     onClick={handleDelete}
                     disabled={loading || deleteConfirm !== 'DELETE'}
                   >
@@ -293,8 +293,8 @@ export default function WorkspaceSettingsPage({ params }: { params: { workspaceS
               onMemberUpdate={fetchMembers}
             />
           ) : (
-            <div className="bg-surface border border-border rounded-lg p-6">
-              <p className="text-text-secondary">Loading member information...</p>
+            <div className="dashboard-section p-6">
+              <p className="text-gray-500">Loading member information...</p>
             </div>
           )}
         </TabsContent>

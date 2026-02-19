@@ -3,8 +3,18 @@
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import Button from '@/components/ui/button'
+import { motion } from 'framer-motion'
 import LoadingSpinner from '@/components/ui/loading-spinner'
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
+}
+
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+}
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams()
@@ -29,73 +39,111 @@ function VerifyEmailContent() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-        <div className="text-center">
-          <LoadingSpinner size="lg" />
-          <p className="mt-4 text-text-secondary">Verifying your email...</p>
-        </div>
+      <div className="text-center">
+        <LoadingSpinner size="lg" />
+        <p className="mt-4 text-white/70 font-medium">Verifying your email...</p>
       </div>
     )
   }
 
   if (status === 'error') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-        <div className="w-full max-w-md">
-          <div className="bg-surface rounded-lg border border-border p-8 shadow-sm text-center">
-            <div className="mx-auto w-16 h-16 bg-error/10 rounded-full flex items-center justify-center mb-4">
-              <svg
-                className="w-8 h-8 text-error"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={staggerContainer}
+        className="w-full max-w-md"
+      >
+        <motion.div
+          variants={fadeUp}
+          className="bg-white rounded-2xl overflow-hidden"
+          style={{
+            border: '3px solid #000',
+            boxShadow: '8px 8px 0 0 rgba(0,0,0,0.85)',
+          }}
+        >
+          <div
+            className="bg-gradient-to-r from-red-400 to-rose-500 px-6 py-3 flex items-center justify-center"
+            style={{ borderBottom: '3px solid #000' }}
+          >
+            <span className="text-white font-bold text-sm">VERIFICATION FAILED</span>
+          </div>
+          <div className="p-8 text-center">
+            <div
+              className="mx-auto w-16 h-16 bg-gradient-to-br from-red-400 to-rose-500 rounded-2xl flex items-center justify-center mb-4 text-2xl"
+              style={{
+                border: '2.5px solid #000',
+                boxShadow: '3px 3px 0 0 rgba(0,0,0,0.85)',
+              }}
+            >
+              ❌
             </div>
-            <h2 className="text-2xl font-bold text-text-primary mb-2">Verification failed</h2>
-            <p className="text-text-secondary mb-8">{message}</p>
+            <h2 className="text-2xl font-extrabold text-gray-900 mb-2">Verification failed</h2>
+            <p className="text-gray-600 mb-8">{message}</p>
             <Link href="/login">
-              <Button className="w-full">Back to login</Button>
+              <button
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-6 rounded-xl text-base transition-all hover:shadow-lg active:translate-y-0.5"
+                style={{
+                  border: '2.5px solid #000',
+                  boxShadow: '4px 4px 0 0 rgba(0,0,0,0.85)',
+                }}
+              >
+                Back to Login
+              </button>
             </Link>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="bg-surface rounded-lg border border-border p-8 shadow-sm text-center">
-          <div className="mx-auto w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mb-4">
-            <svg
-              className="w-8 h-8 text-success"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={staggerContainer}
+      className="w-full max-w-md"
+    >
+      <motion.div
+        variants={fadeUp}
+        className="bg-white rounded-2xl overflow-hidden"
+        style={{
+          border: '3px solid #000',
+          boxShadow: '8px 8px 0 0 rgba(0,0,0,0.85)',
+        }}
+      >
+        <div
+          className="bg-gradient-to-r from-green-400 to-emerald-500 px-6 py-3 flex items-center justify-center"
+          style={{ borderBottom: '3px solid #000' }}
+        >
+          <span className="text-white font-bold text-sm">VERIFIED</span>
+        </div>
+        <div className="p-8 text-center">
+          <div
+            className="mx-auto w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl flex items-center justify-center mb-4 text-2xl"
+            style={{
+              border: '2.5px solid #000',
+              boxShadow: '3px 3px 0 0 rgba(0,0,0,0.85)',
+            }}
+          >
+            ✅
           </div>
-          <h2 className="text-2xl font-bold text-text-primary mb-2">Email verified!</h2>
-          <p className="text-text-secondary mb-8">{message}</p>
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-2">Email verified!</h2>
+          <p className="text-gray-600 mb-8">{message}</p>
           <Link href="/login">
-            <Button className="w-full">Continue to login</Button>
+            <button
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-6 rounded-xl text-base transition-all hover:shadow-lg active:translate-y-0.5"
+              style={{
+                border: '2.5px solid #000',
+                boxShadow: '4px 4px 0 0 rgba(0,0,0,0.85)',
+              }}
+            >
+              Continue to Login →
+            </button>
           </Link>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }
 
@@ -103,11 +151,9 @@ export default function VerifyEmailPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-background px-4 py-12">
-          <div className="text-center">
-            <LoadingSpinner size="lg" />
-            <p className="mt-4 text-text-secondary">Loading...</p>
-          </div>
+        <div className="text-center">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-white/70 font-medium">Loading...</p>
         </div>
       }
     >

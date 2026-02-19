@@ -46,6 +46,7 @@ export default function FormBuilderPage({ params }: { params: { workspaceSlug: s
     selectedFieldId,
     setFormId,
     setFormTitle,
+    setFields,
     addField,
     updateField,
     removeField,
@@ -55,7 +56,7 @@ export default function FormBuilderPage({ params }: { params: { workspaceSlug: s
   useEffect(() => {
     setFormId(params.formId)
 
-    // Load form data including published status
+    // Load form data including published status and fields
     const loadFormData = async () => {
       try {
         const response = await fetch(`/api/forms/${params.formId}`)
@@ -69,6 +70,19 @@ export default function FormBuilderPage({ params }: { params: { workspaceSlug: s
           }
           if (data.form?.title) {
             setFormTitle(data.form.title)
+          }
+          // Load existing fields from DB into the store
+          if (data.form?.fields && data.form.fields.length > 0) {
+            const dbFields = data.form.fields.map((f: any) => ({
+              id: f.id,
+              type: f.type,
+              title: f.title || '',
+              description: f.description || '',
+              isRequired: f.isRequired || false,
+              properties: f.properties || {},
+              orderIndex: f.orderIndex,
+            }))
+            setFields(dbFields)
           }
         }
       } catch (error) {
@@ -95,7 +109,7 @@ export default function FormBuilderPage({ params }: { params: { workspaceSlug: s
 
     loadFormData()
     loadScreens()
-  }, [params.formId, setFormId, setFormTitle])
+  }, [params.formId, setFormId, setFormTitle, setFields])
 
   const handleAddField = (type: FieldType) => {
     // Clear screen selection when adding a field
@@ -124,7 +138,7 @@ export default function FormBuilderPage({ params }: { params: { workspaceSlug: s
 
   const selectedField = fields.find((f) => f.id === selectedFieldId) || null
 
-  const handleSave = async () => {
+  const handleSave = async (silent = false): Promise<boolean> => {
     setIsSaving(true)
     try {
       // Save form metadata
@@ -140,44 +154,52 @@ export default function FormBuilderPage({ params }: { params: { workspaceSlug: s
         throw new Error('Failed to save form')
       }
 
-      // Save fields
-      for (const field of fields) {
+      // Save fields and sync IDs
+      const updatedFields = [...fields]
+      for (let i = 0; i < updatedFields.length; i++) {
+        const field = updatedFields[i]!
+        const fieldData = {
+          type: field.type,
+          title: field.title,
+          description: field.description,
+          required: field.isRequired,
+          properties: field.properties,
+          orderIndex: field.orderIndex,
+        }
+
         const fieldResponse = await fetch(`/api/forms/${params.formId}/fields/${field.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: field.type,
-            title: field.title,
-            description: field.description,
-            required: field.isRequired,
-            properties: field.properties,
-            orderIndex: field.orderIndex,
-          }),
+          body: JSON.stringify(fieldData),
         })
 
-        // If field doesn't exist or update failed, try to create it
+        // If field doesn't exist in DB (client-generated ID), create it
         if (!fieldResponse.ok) {
-          await fetch(`/api/forms/${params.formId}/fields`, {
+          const createResponse = await fetch(`/api/forms/${params.formId}/fields`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              id: field.id,
-              type: field.type,
-              title: field.title,
-              description: field.description,
-              required: field.isRequired,
-              properties: field.properties,
-              orderIndex: field.orderIndex,
-            }),
+            body: JSON.stringify(fieldData),
           })
+
+          if (createResponse.ok) {
+            const created = await createResponse.json()
+            // Update the local field ID to match the DB-generated UUID
+            updatedFields[i] = { ...field, id: created.field.id }
+          }
         }
       }
 
-      addToast({
-        title: 'Form Saved',
-        description: 'Your form has been saved successfully.',
-        variant: 'success',
-      })
+      // Sync store with real DB IDs
+      setFields(updatedFields)
+
+      if (!silent) {
+        addToast({
+          title: 'Form Saved',
+          description: 'Your form has been saved successfully.',
+          variant: 'success',
+        })
+      }
+      return true
     } catch (error) {
       console.error('Failed to save form:', error)
       addToast({
@@ -185,6 +207,7 @@ export default function FormBuilderPage({ params }: { params: { workspaceSlug: s
         description: 'Failed to save form. Please try again.',
         variant: 'error',
       })
+      return false
     } finally {
       setIsSaving(false)
     }
@@ -198,12 +221,20 @@ export default function FormBuilderPage({ params }: { params: { workspaceSlug: s
   const handlePublish = async () => {
     setIsPublishing(true)
     try {
+      // Auto-save the form first to ensure all fields are in the DB
+      const saved = await handleSave(true)
+      if (!saved) {
+        setIsPublishing(false)
+        return
+      }
+
       const response = await fetch(`/api/forms/${params.formId}/publish`, {
         method: 'POST',
       })
 
       if (!response.ok) {
-        throw new Error('Failed to publish form')
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to publish form')
       }
 
       const data = await response.json()
@@ -220,7 +251,7 @@ export default function FormBuilderPage({ params }: { params: { workspaceSlug: s
       console.error('Failed to publish form:', error)
       addToast({
         title: 'Error',
-        description: 'Failed to publish form. Please try again.',
+        description: error instanceof Error ? error.message : 'Failed to publish form. Please try again.',
         variant: 'error',
       })
     } finally {
@@ -325,7 +356,7 @@ export default function FormBuilderPage({ params }: { params: { workspaceSlug: s
                 Share
               </Button>
             )}
-            <Button onClick={handleSave} disabled={isSaving}>
+            <Button onClick={() => handleSave()} disabled={isSaving}>
               {isSaving ? (
                 <svg className="w-5 h-5 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />

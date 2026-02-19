@@ -41,6 +41,7 @@ export interface FormBuilderState {
   setFormId: (id: string) => void
   setFormTitle: (title: string) => void
   setFormDescription: (description: string) => void
+  setFields: (fields: FormField[]) => void
   addField: (field: FormField) => void
   updateField: (id: string, updates: Partial<FormField>) => void
   removeField: (id: string) => void
@@ -66,6 +67,8 @@ export const useFormBuilderStore = create<FormBuilderState>((set) => ({
   setFormTitle: (title) => set({ formTitle: title }),
 
   setFormDescription: (description) => set({ formDescription: description }),
+
+  setFields: (fields) => set({ fields }),
 
   addField: (field) =>
     set((state) => ({

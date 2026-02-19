@@ -4,14 +4,6 @@ import bcrypt from 'bcryptjs'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
-function generateSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-    .substring(0, 50) || 'untitled-form'
-}
-
 export async function GET(_req: Request, { params }: { params: { formId: string } }) {
   try {
     const session = await getServerSession(authOptions)
@@ -58,10 +50,6 @@ export async function PATCH(req: Request, { params }: { params: { formId: string
     // Basic fields
     if (body.title !== undefined) {
       updateData.title = body.title
-      // Only regenerate slug if explicitly not provided
-      if (body.slug === undefined) {
-        updateData.slug = generateSlug(body.title)
-      }
     }
     if (body.slug !== undefined) updateData.slug = body.slug
     if (body.description !== undefined) updateData.description = body.description

@@ -37,6 +37,7 @@ export default function WorkspacePage({
   const [forms, setForms] = useState<Form[]>([])
   const [workspace, setWorkspace] = useState<Workspace | null>(null)
   const [loading, setLoading] = useState(true)
+  const [creating, setCreating] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,11 +94,14 @@ export default function WorkspacePage({
     if (!workspace) {
       addToast({
         title: 'Error',
-        description: 'No workspace found',
+        description: 'No workspace found. Please refresh the page.',
         variant: 'error'
       })
       return
     }
+
+    if (creating) return
+    setCreating(true)
 
     try {
       const response = await fetch(`/api/workspaces/${workspace.id}/forms`, {
@@ -110,15 +114,17 @@ export default function WorkspacePage({
         const data = await response.json()
         router.push(`/${params.workspaceSlug}/forms/${data.form.id}/edit`)
       } else {
-        throw new Error('Failed to create form')
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to create form')
       }
     } catch (error) {
       console.error('Failed to create form:', error)
       addToast({
         title: 'Error',
-        description: 'Failed to create form',
+        description: error instanceof Error ? error.message : 'Failed to create form',
         variant: 'error'
       })
+      setCreating(false)
     }
   }
 
@@ -196,7 +202,7 @@ export default function WorkspacePage({
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Button variant="dashboard-primary" onClick={handleCreateForm}>
+          <Button variant="dashboard-primary" onClick={handleCreateForm} isLoading={creating}>
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
@@ -269,7 +275,9 @@ export default function WorkspacePage({
               {searchQuery ? 'Try a different search term' : 'Get started by creating your first form'}
             </p>
             {!searchQuery && (
-              <Button variant="dashboard-primary" onClick={handleCreateForm}>Create New Form</Button>
+              <Button variant="dashboard-primary" onClick={handleCreateForm} isLoading={creating}>
+                Create New Form
+              </Button>
             )}
           </Card>
         )}

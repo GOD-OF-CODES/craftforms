@@ -4,11 +4,13 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 function generateSlug(title: string): string {
-  return title
+  const base = title
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
-    .substring(0, 50) || 'untitled-form'
+    .substring(0, 40) || 'untitled-form'
+  const suffix = Date.now().toString(36) + Math.random().toString(36).substring(2, 6)
+  return `${base}-${suffix}`
 }
 
 export async function GET(

@@ -37,6 +37,7 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
       ),
+      color: 'from-purple-500 to-pink-500',
     },
     {
       name: 'Responses',
@@ -46,6 +47,7 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
         </svg>
       ),
+      color: 'from-blue-500 to-cyan-500',
     },
     {
       name: 'Analytics',
@@ -55,6 +57,7 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
       ),
+      color: 'from-green-500 to-emerald-500',
     },
     {
       name: 'Themes',
@@ -64,6 +67,7 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
         </svg>
       ),
+      color: 'from-orange-400 to-amber-500',
     },
     {
       name: 'Settings',
@@ -74,6 +78,7 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       ),
+      color: 'from-gray-500 to-gray-600',
     },
   ]
 
@@ -116,40 +121,60 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
   ]
 
   return (
-    <aside className="w-64 dashboard-sidebar h-screen sticky top-0 flex flex-col relative z-20">
+    <aside
+      className="w-64 h-screen sticky top-0 flex flex-col relative z-20 bg-white"
+      style={{
+        borderRight: '3px solid #000',
+        boxShadow: '4px 0 0 0 rgba(0,0,0,0.85)',
+      }}
+    >
       {/* Logo */}
-      <div className="p-6 border-b border-indigo-500/20">
+      <div className="p-6" style={{ borderBottom: '3px solid #000' }}>
         <Link href="/dashboard" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center relative"
+          <div
+            className="w-9 h-9 bg-gradient-to-br from-orange-400 to-amber-500 rounded-lg flex items-center justify-center"
             style={{
-              background: 'linear-gradient(135deg, #6366F1 0%, #A855F7 100%)',
-              boxShadow: '0 0 16px rgba(99,102,241,0.3)',
+              border: '2px solid #000',
+              boxShadow: '2px 2px 0 0 rgba(0,0,0,0.85)',
             }}
           >
-            <span className="text-white font-bold text-lg">C</span>
+            <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <rect x="3" y="4" width="7" height="7" rx="1.5" />
+              <rect x="14" y="4" width="7" height="7" rx="1.5" />
+              <rect x="3" y="13" width="7" height="7" rx="1.5" />
+              <rect x="14" y="13" width="7" height="7" rx="1.5" />
+            </svg>
           </div>
-          <span className="text-lg font-bold text-white tracking-tight">CraftForms</span>
+          <span className="text-xl font-extrabold text-gray-900">CraftForms</span>
         </Link>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 p-4">
-        <ul className="space-y-1">
+        <ul className="space-y-2">
           {navigation.map((item) => (
             <li key={item.name}>
               <Link
                 href={item.href}
                 className={`
-                  flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
+                  flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-bold text-sm
                   ${
                     isActive(item.href)
-                      ? 'nav-active text-indigo-300 font-semibold'
-                      : 'text-white/40 hover:bg-white/[0.04] hover:text-white/80'
+                      ? `bg-gradient-to-r ${item.color} text-white`
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                   }
                 `}
+                style={
+                  isActive(item.href)
+                    ? {
+                        border: '2.5px solid #000',
+                        boxShadow: '3px 3px 0 0 rgba(0,0,0,0.85)',
+                      }
+                    : {}
+                }
               >
                 {item.icon}
-                <span className="font-medium text-sm">{item.name}</span>
+                <span>{item.name}</span>
               </Link>
             </li>
           ))}
@@ -157,13 +182,20 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
       </nav>
 
       {/* Footer with profile + XP */}
-      <div className="relative p-4 border-t border-indigo-500/20" ref={menuRef}>
-        {/* Profile popup menu — light theme popup */}
+      <div className="relative p-4" style={{ borderTop: '3px solid #000' }} ref={menuRef}>
+        {/* Profile popup menu */}
         {showProfileMenu && (
-          <div className="absolute bottom-full left-4 right-4 mb-2 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-50">
+          <div
+            className="absolute bottom-full left-4 right-4 mb-2 bg-white overflow-hidden z-50"
+            style={{
+              border: '2.5px solid #000',
+              borderRadius: '12px',
+              boxShadow: '4px 4px 0 0 rgba(0,0,0,0.85)',
+            }}
+          >
             {/* User info header */}
-            <div className="px-4 py-3 border-b border-gray-100">
-              <p className="text-sm font-medium text-gray-900 truncate">
+            <div className="px-4 py-3" style={{ borderBottom: '2px solid #000' }}>
+              <p className="text-sm font-bold text-gray-900 truncate">
                 {session?.user?.name || 'User'}
               </p>
               <p className="text-xs text-gray-500 truncate">
@@ -178,7 +210,7 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
                   key={item.label}
                   href={item.href}
                   onClick={() => setShowProfileMenu(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-yellow-100 hover:text-gray-900 transition-colors"
                 >
                   {item.icon}
                   {item.label}
@@ -187,10 +219,10 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
             </div>
 
             {/* Logout */}
-            <div className="border-t border-gray-100 py-1">
+            <div style={{ borderTop: '2px solid #000' }} className="py-1">
               <button
                 onClick={() => signOut({ callbackUrl: '/login' })}
-                className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors w-full"
+                className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 transition-colors w-full"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -204,39 +236,59 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
         {/* XP Progress */}
         <div className="mb-3 px-1">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="level-badge">LVL 7</span>
-            <span className="text-[10px] text-white/30 font-mono">2,450 / 3,000 XP</span>
+            <span
+              className="text-xs font-bold px-2 py-0.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md"
+              style={{ border: '2px solid #000', boxShadow: '2px 2px 0 0 rgba(0,0,0,0.85)' }}
+            >
+              LVL 7
+            </span>
+            <span className="text-[10px] text-gray-400 font-mono font-bold">2,450 / 3,000 XP</span>
           </div>
-          <div className="xp-bar">
-            <div className="xp-bar-fill" style={{ width: '82%' }} />
+          <div
+            className="overflow-hidden"
+            style={{
+              background: '#E5E7EB',
+              borderRadius: '999px',
+              height: '8px',
+              border: '2px solid #000',
+            }}
+          >
+            <div
+              style={{
+                width: '82%',
+                height: '100%',
+                borderRadius: '999px',
+                background: 'linear-gradient(90deg, #8B5CF6, #EC4899)',
+              }}
+            />
           </div>
         </div>
 
         {/* Profile button */}
         <button
           onClick={() => setShowProfileMenu(!showProfileMenu)}
-          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl hover:bg-white/[0.04] transition-colors"
+          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl hover:bg-gray-100 transition-colors"
         >
           <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-purple-500 to-pink-500"
             style={{
-              background: 'linear-gradient(135deg, rgba(99,102,241,0.3), rgba(168,85,247,0.3))',
-              border: '1px solid rgba(99,102,241,0.2)',
+              border: '2px solid #000',
+              boxShadow: '2px 2px 0 0 rgba(0,0,0,0.85)',
             }}
           >
-            <span className="text-indigo-300 font-semibold text-sm">
+            <span className="text-white font-bold text-sm">
               {session?.user?.name?.[0]?.toUpperCase() || session?.user?.email?.[0]?.toUpperCase() || 'U'}
             </span>
           </div>
           <div className="flex-1 min-w-0 text-left">
-            <p className="text-sm font-medium text-white/90 truncate">
+            <p className="text-sm font-bold text-gray-900 truncate">
               {session?.user?.name || 'User'}
             </p>
-            <p className="text-xs text-white/30 truncate">
+            <p className="text-xs text-gray-500 truncate">
               {session?.user?.email || ''}
             </p>
           </div>
-          <svg className={`w-4 h-4 text-white/30 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`w-4 h-4 text-gray-400 transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
           </svg>
         </button>

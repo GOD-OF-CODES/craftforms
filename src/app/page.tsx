@@ -264,7 +264,6 @@ export default function LandingPage() {
   const [showDemo, setShowDemo] = useState(false)
   const { scrollY } = useScroll()
   const heroParallax = useTransform(scrollY, [0, 600], [0, -60])
-  const bgParallax = useTransform(scrollY, [0, 1000], [0, -25])
 
   return (
     <div className="min-h-screen relative overflow-x-hidden" style={{ background: '#00D4FF' }}>
@@ -281,11 +280,11 @@ export default function LandingPage() {
         <PixelCloud className="absolute top-[16%] animate-drift" size={7} style={{ animationDelay: '-20s' }} />
 
         {/* Mountain Layers */}
-        <motion.svg
+        <svg
           className="absolute bottom-[12vh] left-0 w-full"
           viewBox="0 0 1440 400"
           preserveAspectRatio="none"
-          style={{ height: '45vh', y: bgParallax }}
+          style={{ height: '45vh' }}
         >
           {/* Far mountains - lighter */}
           <path
@@ -302,7 +301,7 @@ export default function LandingPage() {
             d="M0 360 L120 300 L220 340 L340 270 L440 320 L560 260 L660 300 L780 240 L880 290 L980 230 L1080 280 L1180 230 L1300 270 L1400 240 L1440 260 L1440 400 L0 400Z"
             fill="#5C608E"
           />
-        </motion.svg>
+        </svg>
 
         {/* Ground */}
         <div

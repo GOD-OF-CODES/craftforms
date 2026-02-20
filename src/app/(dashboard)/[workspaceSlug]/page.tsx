@@ -300,15 +300,16 @@ export default function WorkspacePage({
                     >
                       {form.isPublished ? '✓ Published' : 'Draft'}
                     </span>
-                    <span
-                      className="inline-flex items-center px-2.5 py-1 text-xs font-bold rounded-lg bg-yellow-300 text-gray-900"
+                    <Link
+                      href={`/${params.workspaceSlug}/forms/${form.id}/responses`}
+                      className="inline-flex items-center px-2.5 py-1 text-xs font-bold rounded-lg bg-yellow-300 text-gray-900 hover:bg-yellow-400 transition-colors cursor-pointer"
                       style={{
                         border: '2px solid #000',
                         boxShadow: '2px 2px 0 0 rgba(0,0,0,0.85)',
                       }}
                     >
                       📝 {form.responseCount} responses
-                    </span>
+                    </Link>
                   </div>
 
                   <div className="pt-4" style={{ borderTop: '2px dashed rgba(0,0,0,0.15)' }}>

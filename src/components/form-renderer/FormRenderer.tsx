@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Button from '@/components/ui/button'
 import Progress from '@/components/ui/progress'
@@ -45,6 +45,8 @@ interface FormRendererProps {
     redirectUrl?: string
   }
   themeStyles?: ThemeStyles
+  /** Extra CSS class on the progress bar wrapper (e.g. "top-10" to clear a banner) */
+  progressBarClassName?: string
 }
 
 const FormRenderer = ({
@@ -55,7 +57,8 @@ const FormRenderer = ({
   allowNavigation = true,
   welcomeScreen,
   thankYouScreen,
-  themeStyles: _themeStyles // Reserved for future use
+  themeStyles: _themeStyles, // Reserved for future use
+  progressBarClassName
 }: FormRendererProps) => {
   const [currentIndex, setCurrentIndex] = useState(welcomeScreen?.enabled ? -1 : 0)
   const [answers, setAnswers] = useState<Record<string, FieldValue>>({})
@@ -246,17 +249,38 @@ const FormRenderer = ({
     }
   }
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleNext()
-    }
-  }, [handleNext])
+  // Use refs so callbacks stay stable across renders
+  const handleNextRef = useRef(handleNext)
+  handleNextRef.current = handleNext
+  const currentFieldRef = useRef(currentField)
+  currentFieldRef.current = currentField
+
+  // Stable callback so FieldRenderer's useEffect doesn't re-fire every render
+  const handleValidation = useCallback((result: ValidationResult) => {
+    const fieldId = currentFieldRef.current?.id
+    if (!fieldId) return
+    setValidationErrors(prev => {
+      const existing = prev[fieldId]
+      // Bail out if errors haven't actually changed
+      if (existing && existing.length === result.errors.length &&
+          existing.every((e, i) => e === result.errors[i])) {
+        return prev
+      }
+      return { ...prev, [fieldId]: result.errors }
+    })
+  }, [])
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [handleKeyDown])
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter' || e.shiftKey) return
+      // Let Enter insert newlines in long text / textarea fields
+      if (currentFieldRef.current?.type === 'long_text') return
+      e.preventDefault()
+      handleNextRef.current()
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [])
 
   // Animation helpers — use direct props instead of variants to avoid
   // React Strict Mode + Framer Motion v12 conflict where animations get stuck
@@ -289,7 +313,7 @@ const FormRenderer = ({
     <div className="min-h-screen flex flex-col bg-background">
       {/* Progress bar */}
       {showProgressBar && (
-        <div className="fixed top-0 left-0 right-0 z-10">
+        <div className={`fixed left-0 right-0 z-10 ${progressBarClassName || 'top-0'}`}>
           <Progress value={progress} showLabel={false} />
         </div>
       )}
@@ -339,12 +363,7 @@ const FormRenderer = ({
                     value={answers[currentField.id]}
                     onChange={handleAnswerChange}
                     showValidation={showValidation}
-                    onValidation={(result: ValidationResult) => {
-                      setValidationErrors(prev => ({
-                        ...prev,
-                        [currentField.id]: result.errors
-                      }))
-                    }}
+                    onValidation={handleValidation}
                   />
                 </div>
 

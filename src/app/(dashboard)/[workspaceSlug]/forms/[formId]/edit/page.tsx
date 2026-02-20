@@ -154,8 +154,16 @@ export default function FormBuilderPage({ params }: { params: { workspaceSlug: s
         throw new Error('Failed to save form')
       }
 
+      // Fetch current DB fields so we can delete removed ones
+      const dbFieldsRes = await fetch(`/api/forms/${params.formId}/fields`)
+      const dbFieldsData = dbFieldsRes.ok ? await dbFieldsRes.json() : { fields: [] }
+      const dbFieldIdList: string[] = (dbFieldsData.fields || []).map((f: { id: string }) => f.id)
+      const dbFieldIds = new Set(dbFieldIdList)
+
       // Save fields and sync IDs
       const updatedFields = [...fields]
+      const localFieldIds = new Set<string>()
+
       for (let i = 0; i < updatedFields.length; i++) {
         const field = updatedFields[i]!
         const fieldData = {
@@ -164,17 +172,19 @@ export default function FormBuilderPage({ params }: { params: { workspaceSlug: s
           description: field.description,
           required: field.isRequired,
           properties: field.properties,
-          orderIndex: field.orderIndex,
+          orderIndex: i, // Use array position as orderIndex for correct ordering
         }
 
-        const fieldResponse = await fetch(`/api/forms/${params.formId}/fields/${field.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(fieldData),
-        })
-
-        // If field doesn't exist in DB (client-generated ID), create it
-        if (!fieldResponse.ok) {
+        if (dbFieldIds.has(field.id)) {
+          // Field exists in DB — update it
+          await fetch(`/api/forms/${params.formId}/fields/${field.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(fieldData),
+          })
+          localFieldIds.add(field.id)
+        } else {
+          // New field (client-generated ID) — create it
           const createResponse = await fetch(`/api/forms/${params.formId}/fields`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -183,9 +193,18 @@ export default function FormBuilderPage({ params }: { params: { workspaceSlug: s
 
           if (createResponse.ok) {
             const created = await createResponse.json()
-            // Update the local field ID to match the DB-generated UUID
             updatedFields[i] = { ...field, id: created.field.id }
+            localFieldIds.add(created.field.id)
           }
+        }
+      }
+
+      // Delete DB fields that were removed locally
+      for (const dbId of dbFieldIdList) {
+        if (!localFieldIds.has(dbId)) {
+          await fetch(`/api/forms/${params.formId}/fields/${dbId}`, {
+            method: 'DELETE',
+          })
         }
       }
 
@@ -213,8 +232,17 @@ export default function FormBuilderPage({ params }: { params: { workspaceSlug: s
     }
   }
 
-  const handlePreview = () => {
-    // Open form preview in new tab
+  const handlePreview = async () => {
+    // Auto-save before opening preview so the DB is in sync
+    const saved = await handleSave(true)
+    if (!saved) {
+      addToast({
+        title: 'Save Failed',
+        description: 'Could not save form before preview. Please try again.',
+        variant: 'error',
+      })
+      return
+    }
     window.open(`/preview/${params.formId}`, '_blank')
   }
 

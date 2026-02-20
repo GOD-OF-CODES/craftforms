@@ -25,13 +25,15 @@ export const POST = withAuth(async (req, { params }, session) => {
 
   const data = await req.json()
 
-  // Get the current max order
-  const maxOrderField = await prisma.formField.findFirst({
-    where: { formId: params.formId },
-    orderBy: { orderIndex: 'desc' },
-  })
-
-  const orderIndex = maxOrderField ? maxOrderField.orderIndex + 1 : 0
+  // Use explicit orderIndex if provided, otherwise auto-increment
+  let orderIndex = data.orderIndex
+  if (orderIndex === undefined) {
+    const maxOrderField = await prisma.formField.findFirst({
+      where: { formId: params.formId },
+      orderBy: { orderIndex: 'desc' },
+    })
+    orderIndex = maxOrderField ? maxOrderField.orderIndex + 1 : 0
+  }
 
   const field = await prisma.formField.create({
     data: {

@@ -131,7 +131,7 @@ export default function FormPreviewPage({
         <span className="mx-2">-</span>
         <span>Responses will not be saved</span>
         <button
-          onClick={() => router.back()}
+          onClick={() => window.close()}
           className="ml-4 px-3 py-1 bg-yellow-900 text-yellow-100 rounded text-sm hover:bg-yellow-800 transition-colors"
         >
           Exit Preview
@@ -157,6 +157,7 @@ export default function FormPreviewPage({
           showProgressBar={form.settings?.showProgressBar !== false}
           showQuestionNumbers={form.settings?.showQuestionNumbers !== false}
           onSubmit={handleSubmit}
+          progressBarClassName="top-10"
         />
       </div>
     </div>

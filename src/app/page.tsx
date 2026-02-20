@@ -976,7 +976,7 @@ export default function LandingPage() {
 
         {/* ─── How It Works ─── */}
         <section id="how-it-works" className="py-16 px-4">
-          <div className="max-w-5xl mx-auto">
+          <div className="max-w-5xl mx-auto bg-white/30 backdrop-blur-sm rounded-3xl px-6 sm:px-10 py-4" style={{ border: '2px solid rgba(255,255,255,0.3)' }}>
             <motion.div
               initial="hidden"
               whileInView="visible"

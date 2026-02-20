@@ -119,7 +119,7 @@ const Sidebar = ({ workspaceSlug }: SidebarProps) => {
     <aside className="w-64 dashboard-sidebar h-screen sticky top-0 flex flex-col relative z-20">
       {/* Logo */}
       <div className="p-6 border-b border-indigo-500/20">
-        <Link href="/" className="flex items-center gap-2.5">
+        <Link href="/dashboard" className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center relative"
             style={{
               background: 'linear-gradient(135deg, #6366F1 0%, #A855F7 100%)',

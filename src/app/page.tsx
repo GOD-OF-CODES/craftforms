@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import GameDemo from '@/components/landing/GameDemo'
 
 // ─── Animation Helpers ───────────────────────────────────────────
@@ -75,6 +75,134 @@ function PixelCloud({ className = '', size = 10, style }: { className?: string; 
         }}
       />
     </div>
+  )
+}
+
+// ─── Smiley Sun (eyes follow mouse) ─────────────────────────────
+
+function SmileySun() {
+  const [mouse, setMouse] = useState({ x: 0, y: 0 })
+  const sunRef = React.useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => setMouse({ x: e.clientX, y: e.clientY })
+    window.addEventListener('mousemove', handler)
+    return () => window.removeEventListener('mousemove', handler)
+  }, [])
+
+  // Compute eye pupil offset based on angle from sun center to mouse
+  const getEyeOffset = () => {
+    if (!sunRef.current) return { x: 0, y: 0 }
+    const rect = sunRef.current.getBoundingClientRect()
+    const cx = rect.left + rect.width / 2
+    const cy = rect.top + rect.height / 2
+    const dx = mouse.x - cx
+    const dy = mouse.y - cy
+    const dist = Math.sqrt(dx * dx + dy * dy)
+    if (dist === 0) return { x: 0, y: 0 }
+    const maxOffset = 3
+    const norm = Math.min(dist / 300, 1)
+    return { x: (dx / dist) * maxOffset * norm, y: (dy / dist) * maxOffset * norm }
+  }
+
+  const eye = getEyeOffset()
+
+  return (
+    <motion.div
+      ref={sunRef}
+      initial={{ scale: 0, rotate: -90 }}
+      animate={{ scale: 1, rotate: 0 }}
+      transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.3 }}
+      className="absolute top-6 right-8 sm:right-16 z-20 pointer-events-none"
+      aria-hidden="true"
+    >
+      {/* Rays — slow spin */}
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+      >
+        {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
+          <div
+            key={deg}
+            className="absolute"
+            style={{
+              width: 6,
+              height: 16,
+              background: '#FFD93D',
+              borderRadius: 3,
+              transform: `rotate(${deg}deg) translateY(-50px)`,
+              boxShadow: '0 0 6px rgba(255,217,61,0.4)',
+            }}
+          />
+        ))}
+      </motion.div>
+
+      {/* Sun body */}
+      <motion.div
+        animate={{ y: [0, -5, 0] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+        style={{
+          width: 80,
+          height: 80,
+          borderRadius: '50%',
+          background: 'radial-gradient(circle at 35% 35%, #FFE566, #FFD93D 50%, #FFC107)',
+          border: '2.5px solid #000',
+          boxShadow: '4px 4px 0 0 rgba(0,0,0,0.85), 0 0 24px rgba(255,217,61,0.35)',
+          position: 'relative',
+        }}
+      >
+        {/* Left eye */}
+        <div style={{
+          position: 'absolute', left: 20, top: 24,
+          width: 12, height: 14, background: '#fff',
+          borderRadius: '50%', border: '2px solid #000',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{
+            width: 6, height: 7, background: '#000', borderRadius: '50%',
+            transform: `translate(${eye.x}px, ${eye.y}px)`,
+            transition: 'transform 0.1s ease-out',
+          }} />
+        </div>
+
+        {/* Right eye */}
+        <div style={{
+          position: 'absolute', left: 44, top: 24,
+          width: 12, height: 14, background: '#fff',
+          borderRadius: '50%', border: '2px solid #000',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{
+            width: 6, height: 7, background: '#000', borderRadius: '50%',
+            transform: `translate(${eye.x}px, ${eye.y}px)`,
+            transition: 'transform 0.1s ease-out',
+          }} />
+        </div>
+
+        {/* Cheeks */}
+        <div style={{
+          position: 'absolute', left: 10, top: 42,
+          width: 12, height: 7, background: 'rgba(255,150,100,0.4)',
+          borderRadius: '50%',
+        }} />
+        <div style={{
+          position: 'absolute', right: 10, top: 42,
+          width: 12, height: 7, background: 'rgba(255,150,100,0.4)',
+          borderRadius: '50%',
+        }} />
+
+        {/* Smile */}
+        <div style={{
+          position: 'absolute', left: 22, top: 46,
+          width: 34, height: 16,
+          borderBottom: '2.5px solid #000',
+          borderLeft: '2.5px solid #000',
+          borderRight: '2.5px solid #000',
+          borderRadius: '0 0 18px 18px',
+        }} />
+      </motion.div>
+    </motion.div>
   )
 }
 
@@ -317,6 +445,9 @@ export default function LandingPage() {
 
       {/* ─── Scrollable Content ─── */}
       <div className="relative z-10">
+        {/* ─── Smiley Sun ─── */}
+        <SmileySun />
+
         {/* ─── Navbar ─── */}
         <div className="sticky top-4 z-50 px-4 pt-4">
           <nav className="max-w-5xl mx-auto bg-white game-card px-4 sm:px-6 py-3 flex items-center justify-between">

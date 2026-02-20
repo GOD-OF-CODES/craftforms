@@ -1,83 +1,45 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { generateSlug } from '@/lib/slug'
+import { withAuth } from '@/lib/apiHandler'
 
-function generateSlug(title: string): string {
-  const base = title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-    .substring(0, 40) || 'untitled-form'
-  const suffix = Date.now().toString(36) + Math.random().toString(36).substring(2, 6)
-  return `${base}-${suffix}`
-}
-
-export async function GET(
-  _req: Request,
-  { params }: { params: { workspaceId: string } }
-) {
-  try {
-    const session = await getServerSession(authOptions)
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const forms = await prisma.form.findMany({
-      where: {
-        workspaceId: params.workspaceId,
+export const GET = withAuth(async (_req, { params }) => {
+  const forms = await prisma.form.findMany({
+    where: {
+      workspaceId: params.workspaceId,
+    },
+    orderBy: {
+      updatedAt: 'desc',
+    },
+    include: {
+      _count: {
+        select: { responses: true },
       },
-      orderBy: {
-        updatedAt: 'desc',
-      },
-      include: {
-        _count: {
-          select: { responses: true },
-        },
-      },
-    })
+    },
+  })
 
-    return NextResponse.json({ forms })
-  } catch (error) {
-    console.error('Get forms error:', error)
-    return NextResponse.json({ error: 'Failed to fetch forms' }, { status: 500 })
+  return NextResponse.json({ forms })
+})
+
+export const POST = withAuth(async (req, { params }, session) => {
+  const { title, description } = await req.json()
+
+  if (!title) {
+    return NextResponse.json({ error: 'Title is required' }, { status: 400 })
   }
-}
 
-export async function POST(
-  req: Request,
-  { params }: { params: { workspaceId: string } }
-) {
-  try {
-    const session = await getServerSession(authOptions)
+  const slug = generateSlug(title, { maxLength: 40, fallback: 'untitled-form', appendTimestamp: true })
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  const form = await prisma.form.create({
+    data: {
+      title,
+      description: description || '',
+      slug,
+      workspaceId: params.workspaceId,
+      createdBy: session.user.id,
+      isPublished: false,
+    },
+  })
 
-    const { title, description } = await req.json()
-
-    if (!title) {
-      return NextResponse.json({ error: 'Title is required' }, { status: 400 })
-    }
-
-    const slug = generateSlug(title)
-
-    const form = await prisma.form.create({
-      data: {
-        title,
-        description: description || '',
-        slug,
-        workspaceId: params.workspaceId,
-        createdBy: session.user.id,
-        isPublished: false,
-      },
-    })
-
-    return NextResponse.json({ form }, { status: 201 })
-  } catch (error) {
-    console.error('Create form error:', error)
-    return NextResponse.json({ error: 'Failed to create form' }, { status: 500 })
-  }
-}
+  return NextResponse.json({ form }, { status: 201 })
+})

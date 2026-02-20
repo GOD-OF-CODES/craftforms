@@ -8,6 +8,8 @@ import Switch from '@/components/ui/switch'
 import Button from '@/components/ui/button'
 import Label from '@/components/ui/label'
 import LogicBuilder from './LogicBuilder'
+import EditableStringList from './EditableStringList'
+import CustomErrorMessageField from './CustomErrorMessageField'
 import { LogicRule } from '@/lib/logicEngine'
 
 interface SettingsPanelProps {
@@ -238,68 +240,38 @@ const SettingsPanel = ({ field, allFields = [], onFieldUpdate, onFieldDelete }: 
 
         {/* Validation Settings for Email Field */}
         {field.type === 'email' && (
-          <>
-            <div className="pt-4 border-t border-border">
-              <h3 className="text-sm font-medium text-text-primary mb-3">Validation</h3>
-            </div>
-            <div>
-              <Label htmlFor="emailErrorMessage">Custom Error Message</Label>
-              <Input
-                id="emailErrorMessage"
-                value={field.properties.customErrorMessage || ''}
-                onChange={(e) =>
-                  onFieldUpdate({
-                    properties: { ...field.properties, customErrorMessage: e.target.value || undefined },
-                  })
-                }
-                placeholder="Please enter a valid email address"
-              />
-            </div>
-          </>
+          <CustomErrorMessageField
+            id="emailErrorMessage"
+            value={field.properties.customErrorMessage || ''}
+            placeholder="Please enter a valid email address"
+            onChange={(val) =>
+              onFieldUpdate({ properties: { ...field.properties, customErrorMessage: val } })
+            }
+          />
         )}
 
         {/* Validation Settings for URL Field */}
         {field.type === 'url' && (
-          <>
-            <div className="pt-4 border-t border-border">
-              <h3 className="text-sm font-medium text-text-primary mb-3">Validation</h3>
-            </div>
-            <div>
-              <Label htmlFor="urlErrorMessage">Custom Error Message</Label>
-              <Input
-                id="urlErrorMessage"
-                value={field.properties.customErrorMessage || ''}
-                onChange={(e) =>
-                  onFieldUpdate({
-                    properties: { ...field.properties, customErrorMessage: e.target.value || undefined },
-                  })
-                }
-                placeholder="Please enter a valid URL"
-              />
-            </div>
-          </>
+          <CustomErrorMessageField
+            id="urlErrorMessage"
+            value={field.properties.customErrorMessage || ''}
+            placeholder="Please enter a valid URL"
+            onChange={(val) =>
+              onFieldUpdate({ properties: { ...field.properties, customErrorMessage: val } })
+            }
+          />
         )}
 
         {/* Validation Settings for Phone Field */}
         {field.type === 'phone' && (
-          <>
-            <div className="pt-4 border-t border-border">
-              <h3 className="text-sm font-medium text-text-primary mb-3">Validation</h3>
-            </div>
-            <div>
-              <Label htmlFor="phoneErrorMessage">Custom Error Message</Label>
-              <Input
-                id="phoneErrorMessage"
-                value={field.properties.customErrorMessage || ''}
-                onChange={(e) =>
-                  onFieldUpdate({
-                    properties: { ...field.properties, customErrorMessage: e.target.value || undefined },
-                  })
-                }
-                placeholder="Please enter a valid phone number"
-              />
-            </div>
-          </>
+          <CustomErrorMessageField
+            id="phoneErrorMessage"
+            value={field.properties.customErrorMessage || ''}
+            placeholder="Please enter a valid phone number"
+            onChange={(val) =>
+              onFieldUpdate({ properties: { ...field.properties, customErrorMessage: val } })
+            }
+          />
         )}
 
         {field.type === 'number' && (
@@ -351,78 +323,28 @@ const SettingsPanel = ({ field, allFields = [], onFieldUpdate, onFieldDelete }: 
                 placeholder="Any"
               />
             </div>
-            <div>
-              <Label htmlFor="numberErrorMessage">Custom Error Message</Label>
-              <Input
-                id="numberErrorMessage"
-                value={field.properties.customErrorMessage || ''}
-                onChange={(e) =>
-                  onFieldUpdate({
-                    properties: { ...field.properties, customErrorMessage: e.target.value || undefined },
-                  })
-                }
-                placeholder="Please enter a valid number"
-              />
-            </div>
+            <CustomErrorMessageField
+              id="numberErrorMessage"
+              value={field.properties.customErrorMessage || ''}
+              placeholder="Please enter a valid number"
+              onChange={(val) =>
+                onFieldUpdate({ properties: { ...field.properties, customErrorMessage: val } })
+              }
+            />
           </>
         )}
 
         {/* Options for Multiple Choice, Checkboxes, Dropdown */}
         {(field.type === 'multiple_choice' || field.type === 'checkboxes' || field.type === 'dropdown') && (
-          <div>
-            <Label>Options</Label>
-            <div className="space-y-2">
-              {(field.properties.options || ['Option 1', 'Option 2', 'Option 3']).map((option: string, index: number) => (
-                <div key={index} className="flex gap-2">
-                  <Input
-                    value={option}
-                    onChange={(e) => {
-                      const newOptions = [...(field.properties.options || ['Option 1', 'Option 2', 'Option 3'])]
-                      newOptions[index] = e.target.value
-                      onFieldUpdate({
-                        properties: { ...field.properties, options: newOptions },
-                      })
-                    }}
-                    placeholder={`Option ${index + 1}`}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      const newOptions = (field.properties.options || ['Option 1', 'Option 2', 'Option 3']).filter((_: any, i: number) => i !== index)
-                      onFieldUpdate({
-                        properties: { ...field.properties, options: newOptions },
-                      })
-                    }}
-                    className="flex-shrink-0"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </Button>
-                </div>
-              ))}
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full mt-2"
-              onClick={() => {
-                const currentOptions = field.properties.options || ['Option 1', 'Option 2', 'Option 3']
-                onFieldUpdate({
-                  properties: {
-                    ...field.properties,
-                    options: [...currentOptions, `Option ${currentOptions.length + 1}`],
-                  },
-                })
-              }}
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Add Option
-            </Button>
-          </div>
+          <EditableStringList
+            label="Options"
+            items={field.properties.options || []}
+            defaults={['Option 1', 'Option 2', 'Option 3']}
+            itemLabel="Option"
+            onItemsChange={(items) =>
+              onFieldUpdate({ properties: { ...field.properties, options: items } })
+            }
+          />
         )}
 
         {/* Checkboxes - Min/Max selections */}
@@ -640,173 +562,38 @@ const SettingsPanel = ({ field, allFields = [], onFieldUpdate, onFieldDelete }: 
 
         {/* Ranking */}
         {field.type === 'ranking' && (
-          <div>
-            <Label>Items to Rank</Label>
-            <div className="space-y-2">
-              {(field.properties.items || ['Item 1', 'Item 2', 'Item 3']).map((item: string, index: number) => (
-                <div key={index} className="flex gap-2">
-                  <Input
-                    value={item}
-                    onChange={(e) => {
-                      const newItems = [...(field.properties.items || ['Item 1', 'Item 2', 'Item 3'])]
-                      newItems[index] = e.target.value
-                      onFieldUpdate({
-                        properties: { ...field.properties, items: newItems },
-                      })
-                    }}
-                    placeholder={`Item ${index + 1}`}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => {
-                      const newItems = (field.properties.items || ['Item 1', 'Item 2', 'Item 3']).filter((_: any, i: number) => i !== index)
-                      onFieldUpdate({
-                        properties: { ...field.properties, items: newItems },
-                      })
-                    }}
-                    className="flex-shrink-0"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </Button>
-                </div>
-              ))}
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full mt-2"
-              onClick={() => {
-                const currentItems = field.properties.items || ['Item 1', 'Item 2', 'Item 3']
-                onFieldUpdate({
-                  properties: {
-                    ...field.properties,
-                    items: [...currentItems, `Item ${currentItems.length + 1}`],
-                  },
-                })
-              }}
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Add Item
-            </Button>
-          </div>
+          <EditableStringList
+            label="Items to Rank"
+            items={field.properties.items || []}
+            defaults={['Item 1', 'Item 2', 'Item 3']}
+            itemLabel="Item"
+            onItemsChange={(items) =>
+              onFieldUpdate({ properties: { ...field.properties, items } })
+            }
+          />
         )}
 
         {/* Matrix/Grid */}
         {field.type === 'matrix' && (
           <>
-            <div>
-              <Label>Rows</Label>
-              <div className="space-y-2">
-                {(field.properties.rows || ['Row 1', 'Row 2']).map((row: string, index: number) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      value={row}
-                      onChange={(e) => {
-                        const newRows = [...(field.properties.rows || ['Row 1', 'Row 2'])]
-                        newRows[index] = e.target.value
-                        onFieldUpdate({
-                          properties: { ...field.properties, rows: newRows },
-                        })
-                      }}
-                      placeholder={`Row ${index + 1}`}
-                    />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        const newRows = (field.properties.rows || ['Row 1', 'Row 2']).filter((_: any, i: number) => i !== index)
-                        onFieldUpdate({
-                          properties: { ...field.properties, rows: newRows },
-                        })
-                      }}
-                      className="flex-shrink-0"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full mt-2"
-                onClick={() => {
-                  const currentRows = field.properties.rows || ['Row 1', 'Row 2']
-                  onFieldUpdate({
-                    properties: {
-                      ...field.properties,
-                      rows: [...currentRows, `Row ${currentRows.length + 1}`],
-                    },
-                  })
-                }}
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Add Row
-              </Button>
-            </div>
-            <div>
-              <Label>Columns</Label>
-              <div className="space-y-2">
-                {(field.properties.columns || ['Column 1', 'Column 2']).map((col: string, index: number) => (
-                  <div key={index} className="flex gap-2">
-                    <Input
-                      value={col}
-                      onChange={(e) => {
-                        const newColumns = [...(field.properties.columns || ['Column 1', 'Column 2'])]
-                        newColumns[index] = e.target.value
-                        onFieldUpdate({
-                          properties: { ...field.properties, columns: newColumns },
-                        })
-                      }}
-                      placeholder={`Column ${index + 1}`}
-                    />
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        const newColumns = (field.properties.columns || ['Column 1', 'Column 2']).filter((_: any, i: number) => i !== index)
-                        onFieldUpdate({
-                          properties: { ...field.properties, columns: newColumns },
-                        })
-                      }}
-                      className="flex-shrink-0"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </Button>
-                  </div>
-                ))}
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="w-full mt-2"
-                onClick={() => {
-                  const currentColumns = field.properties.columns || ['Column 1', 'Column 2']
-                  onFieldUpdate({
-                    properties: {
-                      ...field.properties,
-                      columns: [...currentColumns, `Column ${currentColumns.length + 1}`],
-                    },
-                  })
-                }}
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Add Column
-              </Button>
-            </div>
+            <EditableStringList
+              label="Rows"
+              items={field.properties.rows || []}
+              defaults={['Row 1', 'Row 2']}
+              itemLabel="Row"
+              onItemsChange={(rows) =>
+                onFieldUpdate({ properties: { ...field.properties, rows } })
+              }
+            />
+            <EditableStringList
+              label="Columns"
+              items={field.properties.columns || []}
+              defaults={['Column 1', 'Column 2']}
+              itemLabel="Column"
+              onItemsChange={(columns) =>
+                onFieldUpdate({ properties: { ...field.properties, columns } })
+              }
+            />
           </>
         )}
 

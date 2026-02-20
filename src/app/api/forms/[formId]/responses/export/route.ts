@@ -1,174 +1,139 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { buildDateRangeFilter } from '@/lib/dateFilter'
+import { withAuth } from '@/lib/apiHandler'
+import { verifyFormAccess } from '@/lib/formAccess'
 
 // POST /api/forms/[formId]/responses/export - Export responses as CSV or Excel
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { formId: string } }
-) {
-  try {
-    const session = await getServerSession(authOptions)
+export const POST = withAuth(async (req, { params }, session) => {
+  const form = await verifyFormAccess(params.formId, session.user.id, {
+    include: { fields: { orderBy: { orderIndex: 'asc' } } }
+  })
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  if (!form) {
+    return NextResponse.json({ error: 'Form not found' }, { status: 404 })
+  }
 
-    // Verify form access
-    const form = await prisma.form.findFirst({
-      where: {
-        id: params.formId,
-        workspace: {
-          OR: [
-            { ownerId: session.user.id },
-            { members: { some: { userId: session.user.id } } }
-          ]
-        }
-      },
-      include: {
-        fields: {
-          orderBy: { orderIndex: 'asc' }
-        }
-      }
-    })
+  const body = await req.json()
+  const {
+    format = 'csv',
+    responseIds,
+    startDate,
+    endDate,
+    status
+  } = body
 
-    if (!form) {
-      return NextResponse.json({ error: 'Form not found' }, { status: 404 })
-    }
+  // Build where clause
+  const where: Record<string, unknown> = { formId: params.formId }
 
-    const body = await req.json()
-    const {
-      format = 'csv',
-      responseIds,
-      startDate,
-      endDate,
-      status
-    } = body
+  // Filter by specific response IDs if provided
+  if (responseIds && Array.isArray(responseIds) && responseIds.length > 0) {
+    where.id = { in: responseIds }
+  }
 
-    // Build where clause
-    const where: Record<string, unknown> = { formId: params.formId }
+  // Filter by date range
+  const dateFilter = buildDateRangeFilter(startDate, endDate)
+  if (dateFilter) {
+    where.createdAt = dateFilter
+  }
 
-    // Filter by specific response IDs if provided
-    if (responseIds && Array.isArray(responseIds) && responseIds.length > 0) {
-      where.id = { in: responseIds }
-    }
+  // Filter by status
+  if (status === 'completed') {
+    where.isCompleted = true
+  } else if (status === 'incomplete') {
+    where.isCompleted = false
+  }
 
-    // Filter by date range
-    if (startDate || endDate) {
-      where.createdAt = {}
-      if (startDate) {
-        (where.createdAt as Record<string, Date>).gte = new Date(startDate)
-      }
-      if (endDate) {
-        (where.createdAt as Record<string, Date>).lte = new Date(endDate)
-      }
-    }
-
-    // Filter by status
-    if (status === 'completed') {
-      where.isCompleted = true
-    } else if (status === 'incomplete') {
-      where.isCompleted = false
-    }
-
-    // Get responses with answers
-    const responses = await prisma.response.findMany({
-      where,
-      include: {
-        answers: {
-          include: {
-            field: {
-              select: {
-                id: true,
-                title: true,
-                type: true,
-                orderIndex: true
-              }
+  // Get responses with answers
+  const responses = await prisma.response.findMany({
+    where,
+    include: {
+      answers: {
+        include: {
+          field: {
+            select: {
+              id: true,
+              title: true,
+              type: true,
+              orderIndex: true
             }
           }
         }
-      },
-      orderBy: { createdAt: 'desc' }
-    })
-
-    // Build field headers from form fields
-    const fieldHeaders = form.fields.map(f => ({
-      id: f.id,
-      title: f.title || `Field ${f.orderIndex + 1}`,
-      type: f.type
-    }))
-
-    // Format responses for export
-    const rows = responses.map(response => {
-      const row: Record<string, string> = {
-        'Response ID': response.id,
-        'Respondent ID': response.respondentId || '',
-        'Status': response.isCompleted ? 'Completed' : 'Incomplete',
-        'Submitted At': response.createdAt.toISOString(),
-        'Started At': response.startedAt.toISOString(),
-        'Completed At': response.completedAt?.toISOString() || '',
-        'Time Taken (seconds)': response.timeTaken?.toString() || ''
       }
+    },
+    orderBy: { createdAt: 'desc' }
+  })
 
-      // Add answers for each field
-      fieldHeaders.forEach(field => {
-        const answer = response.answers.find(a => a.field.id === field.id)
-        if (answer) {
-          row[field.title] = formatAnswerForExport(answer.value)
-        } else {
-          row[field.title] = ''
-        }
-      })
+  // Build field headers from form fields
+  const fieldHeaders = form.fields.map(f => ({
+    id: f.id,
+    title: f.title || `Field ${f.orderIndex + 1}`,
+    type: f.type
+  }))
 
-      return row
-    })
-
-    // Generate headers
-    const headers = [
-      'Response ID',
-      'Respondent ID',
-      'Status',
-      'Submitted At',
-      'Started At',
-      'Completed At',
-      'Time Taken (seconds)',
-      ...fieldHeaders.map(f => f.title)
-    ]
-
-    if (format === 'csv') {
-      // Generate CSV content
-      const csvContent = generateCSV(headers, rows)
-
-      return new NextResponse(csvContent, {
-        headers: {
-          'Content-Type': 'text/csv',
-          'Content-Disposition': `attachment; filename="${form.title || 'responses'}-export.csv"`
-        }
-      })
-    } else if (format === 'json') {
-      // Return JSON for potential Excel conversion on client
-      return NextResponse.json({
-        headers,
-        rows,
-        form: {
-          id: form.id,
-          title: form.title
-        },
-        exportedAt: new Date().toISOString(),
-        totalResponses: responses.length
-      })
+  // Format responses for export
+  const rows = responses.map(response => {
+    const row: Record<string, string> = {
+      'Response ID': response.id,
+      'Respondent ID': response.respondentId || '',
+      'Status': response.isCompleted ? 'Completed' : 'Incomplete',
+      'Submitted At': response.createdAt.toISOString(),
+      'Started At': response.startedAt.toISOString(),
+      'Completed At': response.completedAt?.toISOString() || '',
+      'Time Taken (seconds)': response.timeTaken?.toString() || ''
     }
 
-    return NextResponse.json({ error: 'Invalid format' }, { status: 400 })
-  } catch (error) {
-    console.error('Export responses error:', error)
-    return NextResponse.json(
-      { error: 'Failed to export responses' },
-      { status: 500 }
-    )
+    // Add answers for each field
+    fieldHeaders.forEach(field => {
+      const answer = response.answers.find(a => a.field.id === field.id)
+      if (answer) {
+        row[field.title] = formatAnswerForExport(answer.value)
+      } else {
+        row[field.title] = ''
+      }
+    })
+
+    return row
+  })
+
+  // Generate headers
+  const headers = [
+    'Response ID',
+    'Respondent ID',
+    'Status',
+    'Submitted At',
+    'Started At',
+    'Completed At',
+    'Time Taken (seconds)',
+    ...fieldHeaders.map(f => f.title)
+  ]
+
+  if (format === 'csv') {
+    // Generate CSV content
+    const csvContent = generateCSV(headers, rows)
+
+    return new NextResponse(csvContent, {
+      headers: {
+        'Content-Type': 'text/csv',
+        'Content-Disposition': `attachment; filename="${form.title || 'responses'}-export.csv"`
+      }
+    })
+  } else if (format === 'json') {
+    // Return JSON for potential Excel conversion on client
+    return NextResponse.json({
+      headers,
+      rows,
+      form: {
+        id: form.id,
+        title: form.title
+      },
+      exportedAt: new Date().toISOString(),
+      totalResponses: responses.length
+    })
   }
-}
+
+  return NextResponse.json({ error: 'Invalid format' }, { status: 400 })
+})
 
 function formatAnswerForExport(value: unknown): string {
   if (value === null || value === undefined) {

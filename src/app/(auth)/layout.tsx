@@ -19,7 +19,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div
       className="min-h-screen relative overflow-hidden flex flex-col"
       style={{
-        background: 'linear-gradient(145deg, #4F46E5 0%, #06B6D4 40%, #00D4FF 70%, #22D3EE 100%)',
+        background: 'linear-gradient(145deg, #4F46E5 0%, #0891B2 40%, #0E7490 70%, #155E75 100%)',
       }}
     >
       {/* Subtle grid pattern overlay */}

@@ -5,6 +5,7 @@ import GitHubProvider from 'next-auth/providers/github'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import { compare } from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
+import { generateSlug } from '@/lib/slug'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -74,11 +75,7 @@ export const authOptions: NextAuthOptions = {
           if (!existingMembership) {
             // Create default workspace for OAuth user
             const workspaceName = user.name ? `${user.name}'s Workspace` : 'My Workspace'
-            let workspaceSlug = workspaceName
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, '-')
-              .replace(/(^-|-$)/g, '')
-              .substring(0, 50) || 'my-workspace'
+            let workspaceSlug = generateSlug(workspaceName)
 
             // Ensure slug is unique
             const existingWorkspace = await prisma.workspace.findUnique({

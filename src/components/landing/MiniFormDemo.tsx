@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import FieldRenderer, { FieldConfig } from '@/components/form-renderer/FieldRenderer'
+import { FieldValue } from '@/types/fields'
 
 const demoFields: FieldConfig[] = [
   {
@@ -130,7 +131,7 @@ export default function MiniFormDemo() {
     return clearTimers
   }, [currentStep, isAutoPlaying, showComplete, typeText, clearTimers])
 
-  const handleChange = (fieldId: string, value: any) => {
+  const handleChange = (fieldId: string, value: FieldValue) => {
     if (isAutoPlaying) stopAutoPlay()
     setValues(prev => ({ ...prev, [fieldId]: value }))
   }

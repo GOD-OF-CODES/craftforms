@@ -5,7 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Button from '@/components/ui/button'
 import Progress from '@/components/ui/progress'
 import FieldRenderer, { FieldConfig, buildValidationRules } from './FieldRenderer'
+import ThankYouScreen from './ThankYouScreen'
+import WelcomeScreen from './WelcomeScreen'
 import { validateField, ValidationResult } from '@/lib/validations'
+import { FieldValue } from '@/types/fields'
 import {
   getNextFieldId,
   getPreviousFieldInPath,
@@ -25,7 +28,7 @@ interface ThemeStyles {
 
 interface FormRendererProps {
   fields: FieldConfig[]
-  onSubmit: (answers: Record<string, any>) => Promise<void>
+  onSubmit: (answers: Record<string, FieldValue>) => Promise<void>
   showProgressBar?: boolean
   showQuestionNumbers?: boolean
   allowNavigation?: boolean
@@ -55,7 +58,7 @@ const FormRenderer = ({
   themeStyles: _themeStyles // Reserved for future use
 }: FormRendererProps) => {
   const [currentIndex, setCurrentIndex] = useState(welcomeScreen?.enabled ? -1 : 0)
-  const [answers, setAnswers] = useState<Record<string, any>>({})
+  const [answers, setAnswers] = useState<Record<string, FieldValue>>({})
   const [validationErrors, setValidationErrors] = useState<Record<string, string[]>>({})
   const [showValidation, setShowValidation] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -222,7 +225,7 @@ const FormRenderer = ({
     }
   }
 
-  const handleAnswerChange = (value: any) => {
+  const handleAnswerChange = (value: FieldValue) => {
     const field = currentField
     if (!field) return
 
@@ -255,94 +258,30 @@ const FormRenderer = ({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
 
-  // Animation variants
-  const variants = {
-    enter: (direction: number) => ({
-      y: direction > 0 ? 50 : -50,
-      opacity: 0
-    }),
-    center: {
-      y: 0,
-      opacity: 1
-    },
-    exit: (direction: number) => ({
-      y: direction > 0 ? -50 : 50,
-      opacity: 0
-    })
-  }
+  // Animation helpers — use direct props instead of variants to avoid
+  // React Strict Mode + Framer Motion v12 conflict where animations get stuck
+  const enterY = direction > 0 ? 30 : -30
+  const exitY = direction > 0 ? -30 : 30
 
   // Thank you screen (show default if none configured)
   if (isSubmitted && thankYouScreen?.enabled !== false) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md text-center"
-        >
-          <div className="w-20 h-20 bg-success/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg
-              className="w-10 h-10 text-success"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-          </div>
-          <h1 className="text-3xl font-bold text-text-primary mb-4">
-            {thankYouScreen?.title || 'Thank you!'}
-          </h1>
-          {thankYouScreen?.description && (
-            <p className="text-lg text-text-secondary">
-              {thankYouScreen.description}
-            </p>
-          )}
-        </motion.div>
-      </div>
+      <ThankYouScreen
+        title={thankYouScreen?.title}
+        description={thankYouScreen?.description}
+      />
     )
   }
 
   // Welcome screen
   if (currentIndex === -1 && welcomeScreen?.enabled) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-lg text-center"
-        >
-          <h1 className="text-4xl font-bold text-text-primary mb-4">
-            {welcomeScreen.title}
-          </h1>
-          {welcomeScreen.description && (
-            <p className="text-lg text-text-secondary mb-8">
-              {welcomeScreen.description}
-            </p>
-          )}
-          <Button size="lg" onClick={handleNext}>
-            {welcomeScreen.buttonText || 'Start'}
-            <svg
-              className="w-5 h-5 ml-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M13 7l5 5m0 0l-5 5m5-5H6"
-              />
-            </svg>
-          </Button>
-        </motion.div>
-      </div>
+      <WelcomeScreen
+        title={welcomeScreen.title}
+        description={welcomeScreen.description}
+        buttonText={welcomeScreen.buttonText}
+        onStart={handleNext}
+      />
     )
   }
 
@@ -358,16 +297,14 @@ const FormRenderer = ({
       {/* Main content */}
       <div className="flex-1 flex items-center justify-center p-4 pt-8">
         <div className="w-full max-w-2xl">
-          <AnimatePresence mode="wait" custom={direction}>
+          <AnimatePresence mode="wait" initial={false}>
             {currentField && (
               <motion.div
                 key={currentField.id}
-                custom={direction}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                initial={{ opacity: 0, y: enterY }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: exitY }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
                 className="space-y-6"
               >
                 {/* Question */}

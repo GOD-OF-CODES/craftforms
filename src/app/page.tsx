@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { motion, useInView, useScroll, useTransform } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { useState } from 'react'
 import GameDemo from '@/components/landing/GameDemo'
 
 // ─── Animation Helpers ───────────────────────────────────────────
@@ -24,13 +24,11 @@ function AnimatedSection({
   children: React.ReactNode
   className?: string
 }) {
-  const ref = useRef(null)
-  const inView = useInView(ref, { once: true, margin: '-80px' })
   return (
     <motion.section
-      ref={ref}
       initial="hidden"
-      animate={inView ? 'visible' : 'hidden'}
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.1 }}
       variants={staggerContainer}
       className={className}
     >
@@ -776,7 +774,7 @@ export default function LandingPage() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: '-80px' }}
+              viewport={{ once: true, amount: 0.1 }}
               variants={staggerContainer}
               className="text-center mb-12"
             >
@@ -810,7 +808,7 @@ export default function LandingPage() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: '-80px' }}
+              viewport={{ once: true, amount: 0.1 }}
               variants={staggerContainer}
               className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5"
             >
@@ -852,7 +850,7 @@ export default function LandingPage() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: '-80px' }}
+              viewport={{ once: true, amount: 0.1 }}
               variants={staggerContainer}
               className="text-center mb-14"
             >
@@ -881,7 +879,7 @@ export default function LandingPage() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: '-80px' }}
+              viewport={{ once: true, amount: 0.1 }}
               variants={staggerContainer}
               className="relative"
             >
@@ -952,7 +950,7 @@ export default function LandingPage() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: '-80px' }}
+              viewport={{ once: true, amount: 0.1 }}
               variants={staggerContainer}
               className="text-center mb-12"
             >
@@ -981,7 +979,7 @@ export default function LandingPage() {
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: '-80px' }}
+              viewport={{ once: true, amount: 0.1 }}
               variants={staggerContainer}
               className="grid md:grid-cols-3 gap-6"
             >

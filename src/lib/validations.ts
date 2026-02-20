@@ -9,8 +9,8 @@ export interface ValidationResult {
   errors: string[]
 }
 
-export interface FieldValue {
-  value: any
+export interface FieldInput {
+  value: unknown
   type: string
 }
 
@@ -18,7 +18,7 @@ export interface FieldValue {
  * Validates a field value against a set of validation rules
  */
 export function validateField(
-  fieldValue: FieldValue,
+  fieldValue: FieldInput,
   rules: ValidationRule[]
 ): ValidationResult {
   const errors: string[] = []
@@ -40,7 +40,7 @@ export function validateField(
  * Validates a single rule
  */
 function validateRule(
-  fieldValue: FieldValue,
+  fieldValue: FieldInput,
   rule: ValidationRule
 ): string | null {
   const { value } = fieldValue
@@ -87,7 +87,7 @@ function validateRule(
 /**
  * Required field validation
  */
-function validateRequired(value: any, message?: string): string | null {
+function validateRequired(value: unknown, message?: string): string | null {
   if (value === null || value === undefined || value === '') {
     return message || 'This field is required'
   }
@@ -102,7 +102,7 @@ function validateRequired(value: any, message?: string): string | null {
 /**
  * Minimum length validation for strings
  */
-function validateMinLength(value: any, minLength: number, message?: string): string | null {
+function validateMinLength(value: unknown, minLength: number, message?: string): string | null {
   if (value === null || value === undefined || value === '') {
     return null // Skip if empty (use required rule for that)
   }
@@ -118,7 +118,7 @@ function validateMinLength(value: any, minLength: number, message?: string): str
 /**
  * Maximum length validation for strings
  */
-function validateMaxLength(value: any, maxLength: number, message?: string): string | null {
+function validateMaxLength(value: unknown, maxLength: number, message?: string): string | null {
   if (value === null || value === undefined || value === '') {
     return null
   }
@@ -134,7 +134,7 @@ function validateMaxLength(value: any, maxLength: number, message?: string): str
 /**
  * Minimum value validation for numbers
  */
-function validateMin(value: any, min: number, message?: string): string | null {
+function validateMin(value: unknown, min: number, message?: string): string | null {
   if (value === null || value === undefined || value === '') {
     return null
   }
@@ -154,7 +154,7 @@ function validateMin(value: any, min: number, message?: string): string | null {
 /**
  * Maximum value validation for numbers
  */
-function validateMax(value: any, max: number, message?: string): string | null {
+function validateMax(value: unknown, max: number, message?: string): string | null {
   if (value === null || value === undefined || value === '') {
     return null
   }
@@ -174,7 +174,7 @@ function validateMax(value: any, max: number, message?: string): string | null {
 /**
  * Regex pattern validation
  */
-function validatePattern(value: any, pattern: string, message?: string): string | null {
+function validatePattern(value: unknown, pattern: string, message?: string): string | null {
   if (value === null || value === undefined || value === '') {
     return null
   }
@@ -192,7 +192,7 @@ function validatePattern(value: any, pattern: string, message?: string): string 
 /**
  * Email format validation
  */
-function validateEmail(value: any, message?: string): string | null {
+function validateEmail(value: unknown, message?: string): string | null {
   if (value === null || value === undefined || value === '') {
     return null
   }
@@ -210,7 +210,7 @@ function validateEmail(value: any, message?: string): string | null {
 /**
  * URL format validation
  */
-function validateURL(value: any, message?: string): string | null {
+function validateURL(value: unknown, message?: string): string | null {
   if (value === null || value === undefined || value === '') {
     return null
   }
@@ -228,7 +228,7 @@ function validateURL(value: any, message?: string): string | null {
 /**
  * Phone number format validation
  */
-function validatePhone(value: any, message?: string): string | null {
+function validatePhone(value: unknown, message?: string): string | null {
   if (value === null || value === undefined || value === '') {
     return null
   }
@@ -247,7 +247,7 @@ function validatePhone(value: any, message?: string): string | null {
 /**
  * File size validation (in MB)
  */
-function validateFileSize(file: any, maxSizeMB: number, message?: string): string | null {
+function validateFileSize(file: unknown, maxSizeMB: number, message?: string): string | null {
   if (!file || !(file instanceof File)) {
     return null
   }
@@ -264,7 +264,7 @@ function validateFileSize(file: any, maxSizeMB: number, message?: string): strin
 /**
  * File type validation
  */
-function validateFileType(file: any, allowedTypes: string, message?: string): string | null {
+function validateFileType(file: unknown, allowedTypes: string, message?: string): string | null {
   if (!file || !(file instanceof File)) {
     return null
   }
@@ -294,7 +294,7 @@ function validateFileType(file: any, allowedTypes: string, message?: string): st
  * Validates multiple fields
  */
 export function validateForm(
-  fields: Array<{ id: string; value: any; type: string; rules: ValidationRule[] }>
+  fields: Array<{ id: string; value: unknown; type: string; rules: ValidationRule[] }>
 ): Record<string, ValidationResult> {
   const results: Record<string, ValidationResult> = {}
 

@@ -140,7 +140,7 @@ export default function LoginPage() {
         </motion.div>
         <h1
           className="text-3xl sm:text-4xl font-extrabold text-white mb-2"
-          style={{ textShadow: '2px 2px 0 rgba(0,0,0,0.15)' }}
+          style={{ textShadow: '2px 2px 0 rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2)' }}
         >
           Sign in to play
         </h1>

@@ -1,14 +1,8 @@
 import { NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
-
-function generateSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-    .substring(0, 50) || 'my-workspace'
-}
+import { generateSlug } from '@/lib/slug'
+import { validatePassword } from '@/lib/passwordPolicy'
 
 export async function POST(req: Request) {
   try {
@@ -21,18 +15,9 @@ export async function POST(req: Request) {
       )
     }
 
-    if (typeof password !== 'string' || password.length < 10) {
-      return NextResponse.json(
-        { error: 'Password must be at least 10 characters' },
-        { status: 400 }
-      )
-    }
-
-    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
-      return NextResponse.json(
-        { error: 'Password must contain uppercase, lowercase, and a number' },
-        { status: 400 }
-      )
+    const passwordCheck = validatePassword(password)
+    if (!passwordCheck.valid) {
+      return NextResponse.json({ error: passwordCheck.error }, { status: 400 })
     }
 
     // Check if user already exists
@@ -109,18 +94,19 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     )
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Signup error:', error)
 
     // Provide more specific error messages for common failures
-    if (error?.code === 'P2002') {
+    const prismaError = error as { code?: string }
+    if (prismaError?.code === 'P2002') {
       return NextResponse.json(
         { error: 'User already exists with this email' },
         { status: 400 }
       )
     }
 
-    if (error?.code === 'P1001' || error?.code === 'P1002') {
+    if (prismaError?.code === 'P1001' || prismaError?.code === 'P1002') {
       return NextResponse.json(
         { error: 'Service temporarily unavailable. Please try again later.' },
         { status: 503 }

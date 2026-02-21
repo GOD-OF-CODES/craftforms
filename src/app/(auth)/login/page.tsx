@@ -42,7 +42,6 @@ function LoginPageContent() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [isDemoLoading, setIsDemoLoading] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
@@ -89,40 +88,6 @@ function LoginPageContent() {
       })
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  const handleDemoLogin = async () => {
-    setIsDemoLoading(true)
-    setError('')
-    try {
-      const demoRes = await fetch('/api/auth/demo-login', { method: 'POST' })
-      if (!demoRes.ok) {
-        throw new Error('Failed to create demo account')
-      }
-      const { email: demoEmail, password: demoPassword } = await demoRes.json()
-
-      const result = await signIn('credentials', {
-        email: demoEmail,
-        password: demoPassword,
-        redirect: false,
-      })
-
-      if (result?.error) {
-        setError('Demo login failed. Please try again.')
-      } else {
-        addToast({
-          title: 'Welcome to the Demo!',
-          description: 'Explore the form builder with sample data.',
-          variant: 'success',
-        })
-        router.push('/dashboard')
-        router.refresh()
-      }
-    } catch {
-      setError('Failed to start demo. Please try again.')
-    } finally {
-      setIsDemoLoading(false)
     }
   }
 
@@ -329,36 +294,6 @@ function LoginPageContent() {
             </Link>
           </motion.p>
 
-          {/* Demo Login */}
-          <motion.div variants={fadeUp} className="mt-5 pt-5" style={{ borderTop: '2px dashed #E5E7EB' }}>
-            <button
-              type="button"
-              onClick={handleDemoLogin}
-              disabled={isLoading || isDemoLoading}
-              className="w-full bg-gradient-to-r from-green-400 to-emerald-500 text-white font-bold py-2.5 px-6 rounded-xl text-sm transition-all hover:shadow-lg active:translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                border: '2.5px solid #000',
-                boxShadow: '3px 3px 0 0 rgba(0,0,0,0.85)',
-              }}
-            >
-              {isDemoLoading ? (
-                <span className="inline-flex items-center gap-2">
-                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  Loading demo...
-                </span>
-              ) : (
-                <span className="inline-flex items-center gap-2">
-                  ▶ Try Demo Account
-                </span>
-              )}
-            </button>
-            <p className="mt-2 text-center text-xs text-gray-400 font-medium">
-              Explore with sample forms and responses
-            </p>
-          </motion.div>
         </div>
       </motion.div>
     </motion.div>

@@ -120,7 +120,7 @@ jobs:
         run: npx prisma migrate deploy
 
       - name: Build application
-        run: npm run build
+        run: npx next build
 
       - name: Run E2E tests
         run: npm run test:e2e
@@ -154,7 +154,7 @@ jobs:
         run: npx prisma generate
 
       - name: Build
-        run: npm run build
+        run: npx next build
 
   deploy-preview:
     name: Deploy Preview

@@ -35,7 +35,7 @@ export const GET = withAuth(async (_req, { params }, session) => {
           id: true,
           name: true,
           email: true,
-          avatarUrl: true
+          image: true
         }
       }
     },
@@ -51,7 +51,7 @@ export const GET = withAuth(async (_req, { params }, session) => {
           id: true,
           name: true,
           email: true,
-          avatarUrl: true
+          image: true
         }
       }
     }
@@ -148,7 +148,7 @@ export const POST = withAuth(async (req, { params }, session) => {
             id: true,
             name: true,
             email: true,
-            avatarUrl: true
+            image: true
           }
         }
       }

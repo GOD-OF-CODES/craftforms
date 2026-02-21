@@ -13,7 +13,7 @@ interface User {
   id: string
   name: string | null
   email: string
-  avatarUrl: string | null
+  image: string | null
 }
 
 interface Member {
@@ -200,7 +200,7 @@ export function MemberList({
           <div className="p-4 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Avatar
-                src={owner.avatarUrl || undefined}
+                src={owner.image || undefined}
                 alt={owner.name || owner.email}
                 fallback={owner.name?.[0] || owner.email[0]}
               />
@@ -225,7 +225,7 @@ export function MemberList({
           <div key={member.id} className="p-4 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Avatar
-                src={member.user.avatarUrl || undefined}
+                src={member.user.image || undefined}
                 alt={member.user.name || member.user.email}
                 fallback={member.user.name?.[0] || member.user.email[0]}
               />

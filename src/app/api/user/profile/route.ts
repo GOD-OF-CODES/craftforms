@@ -9,7 +9,7 @@ export const GET = withAuth(async (_req, _ctx, session) => {
       id: true,
       name: true,
       email: true,
-      avatarUrl: true,
+      image: true,
       createdAt: true,
     },
   })
@@ -60,7 +60,7 @@ export const PATCH = withAuth(async (req, _ctx, session) => {
       id: true,
       name: true,
       email: true,
-      avatarUrl: true,
+      image: true,
     },
   })
 

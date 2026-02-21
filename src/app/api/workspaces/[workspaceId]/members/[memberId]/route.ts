@@ -80,7 +80,7 @@ export const PATCH = withAuth(async (req, { params }, session) => {
           id: true,
           name: true,
           email: true,
-          avatarUrl: true
+          image: true
         }
       }
     }

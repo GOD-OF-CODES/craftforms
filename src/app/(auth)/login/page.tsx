@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import Input from '@/components/ui/input'
@@ -18,14 +18,40 @@ const staggerContainer = {
   visible: { transition: { staggerChildren: 0.08 } },
 }
 
+const oauthErrors: Record<string, string> = {
+  OAuthAccountNotLinked: 'This email is already associated with another sign-in method. Please use your original sign-in method.',
+  OAuthCallback: 'Something went wrong during sign-in. Please try again.',
+  OAuthCreateAccount: 'Could not create your account. Please try again.',
+  Callback: 'Something went wrong during sign-in. Please try again.',
+  AccessDenied: 'Access was denied. Please try again.',
+  Configuration: 'There is a server configuration issue. Please contact support.',
+}
+
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginPageContent />
+    </Suspense>
+  )
+}
+
+function LoginPageContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { addToast } = useToast()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isDemoLoading, setIsDemoLoading] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    if (errorParam) {
+      const message = oauthErrors[errorParam] || 'An error occurred during sign-in. Please try again.'
+      setError(message)
+    }
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

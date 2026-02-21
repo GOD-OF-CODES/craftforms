@@ -43,7 +43,6 @@ export async function verifyFormAccess<T extends Prisma.FormInclude | undefined 
     ...(include ? { include } : {}),
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return result as any
 }
 
@@ -79,6 +78,5 @@ export async function verifyWorkspaceAccess<T extends Prisma.WorkspaceInclude | 
     ...(include ? { include } : {}),
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return result as any
 }

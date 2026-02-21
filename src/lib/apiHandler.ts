@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { Session } from 'next-auth'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RouteContext = { params: any }
 
 type AuthenticatedHandler = (

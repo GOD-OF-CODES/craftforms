@@ -29,14 +29,14 @@ export const queryClientConfig = {
 }
 
 // Singleton query client for client-side
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 let browserQueryClient: any
 
 // Factory function to create query client when @tanstack/react-query is installed
 export function createQueryClient() {
   try {
     // Dynamic import to avoid build errors if not installed
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
+
     const { QueryClient } = require('@tanstack/react-query')
     return new QueryClient(queryClientConfig)
   } catch {
@@ -89,7 +89,7 @@ export const queryKeys = {
 }
 
 // Prefetch helpers (requires QueryClient instance)
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export async function prefetchForm(queryClient: any, formId: string) {
   if (!queryClient) return
   await queryClient.prefetchQuery({
@@ -98,7 +98,7 @@ export async function prefetchForm(queryClient: any, formId: string) {
   })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export async function prefetchWorkspace(queryClient: any, slug: string) {
   if (!queryClient) return
   await queryClient.prefetchQuery({

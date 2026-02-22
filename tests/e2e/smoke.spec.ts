@@ -98,7 +98,7 @@ test.describe('Signup Page', () => {
     await page.locator('button[type="submit"]').click()
 
     // Should show a password validation error (too short / missing requirements)
-    await expect(page.locator('text=/password/i')).toBeVisible()
+    await expect(page.locator('.text-error', { hasText: /password/i })).toBeVisible()
   })
 })
 
@@ -106,13 +106,15 @@ test.describe('Non-existent Form URL', () => {
   test('should show error or 404 for non-existent public form', async ({ page }) => {
     const response = await page.goto('/to/nonexistent-workspace/nonexistent-form')
 
-    // Either a 404 status or the page shows an error message
     const status = response?.status() ?? 0
-    const hasErrorContent = await page
-      .locator('text=/not found|404|does not exist|error/i')
-      .isVisible()
-      .catch(() => false)
+    if (status === 404) {
+      // Server-side 404 — test passes
+      return
+    }
 
-    expect(status === 404 || hasErrorContent).toBe(true)
+    // Client-side rendered page: wait for loading to finish and error to appear
+    await expect(
+      page.locator('text=/not found|does not exist|failed to load/i')
+    ).toBeVisible({ timeout: 10000 })
   })
 })

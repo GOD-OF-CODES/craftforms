@@ -27,7 +27,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization)
      * - favicon.ico
+     * - google7b5c05b8f83ca72d.html (Google Search Console verification)
      */
-    '/((?!_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next/static|_next/image|favicon.ico|google7b5c05b8f83ca72d.html).*)',
   ],
 }
